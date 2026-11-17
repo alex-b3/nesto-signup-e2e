@@ -25,6 +25,7 @@ npm run test:fr       # French only
 npm run test:ui       # Playwright UI mode: pick tests, watch the browser, time travel
 npm run report        # open the HTML report from the last run
 npm run typecheck     # tsc, no tests
+npm run lint          # ESLint, no warnings allowed
 ```
 
 Filtering by tag uses Playwright's `--grep`, which also combines with `--project`:
@@ -75,6 +76,11 @@ src/pages/              page objects: locators and actions, no assertions
 tests/signup/           the tests: assertions, no locators
 ```
 
+`npm run lint` uses `eslint-plugin-playwright` together with type-aware rules. The
+one that matters is `missing-playwright-await`: an assertion written without `await`
+passes while checking nothing, and that is the hardest kind of bug to notice in a
+test suite. Warnings are treated as failures so they cannot accumulate.
+
 Locators are `data-testid`, because that is the only anchor that stays the same in
 English and French. The page's `id` attributes are generated (`field-2`, `field-4`,
 …) and move with render order, so they are not used.
@@ -86,8 +92,6 @@ framework described above. Field, validation and API coverage is being added nex
 
 ## What I would add next
 
-- ESLint with `eslint-plugin-playwright`, which catches a missing `await` on an
-  assertion — the mistake that makes a test pass without checking anything.
 - GitHub Actions running both languages on every push, with the HTML report kept
   as an artifact.
 - Cross-browser (Firefox, WebKit) and mobile viewports, on a schedule rather than
