@@ -1,0 +1,16 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Local environment (copy .env.example to .env; never commit .env)
+.env
+.env.*
+!.env.example
+
+# Raw page/network dumps from scripts/discover.ts (may contain test account data)
+/discovery/
