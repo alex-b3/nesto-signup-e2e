@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { Lang } from '../fixtures/test';
+import type { Lang } from '../lang';
 
 /**
  * The signup page. Holds locators and actions; assertions belong in the tests.
@@ -19,6 +19,10 @@ export class SignupPage {
   readonly consent: Locator;
   readonly submit: Locator;
   readonly languageSwitch: Locator;
+  readonly headerLogin: Locator;
+  readonly loginLink: Locator;
+  readonly termsLink: Locator;
+  readonly heading: Locator;
 
   constructor(private readonly page: Page) {
     this.firstName = page.getByTestId('first-name-input');
@@ -31,6 +35,10 @@ export class SignupPage {
     this.consent = page.getByTestId('agreement-checkbox');
     this.submit = page.getByTestId('submit-button');
     this.languageSwitch = page.getByTestId('header-language-switch');
+    this.headerLogin = page.getByTestId('header-login-button');
+    this.loginLink = page.getByTestId('login-link');
+    this.termsLink = page.getByTestId('terms-link');
+    this.heading = page.getByRole('heading');
   }
 
   /** Every control a user fills in, in the order they appear. */
@@ -55,6 +63,16 @@ export class SignupPage {
     await this.page.goto(SignupPage.pathFor(lang));
     // The form is client-rendered, so wait for it rather than for the load event.
     await this.submit.waitFor();
+  }
+
+  /** Every option in the province dropdown, in the order the page lists them. */
+  async provinceOptions(): Promise<{ value: string; text: string }[]> {
+    return this.province.locator('option').evaluateAll((options) =>
+      options.map((option) => ({
+        value: option.getAttribute('value') ?? '',
+        text: option.textContent?.trim() ?? '',
+      })),
+    );
   }
 
   async documentLang(): Promise<string | null> {
