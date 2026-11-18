@@ -1,8 +1,8 @@
 import { test, expect } from '../../src/fixtures/test';
 import { SignupPage } from '../../src/pages/SignupPage';
 
-test.describe('Signup page smoke', () => {
-  test('The form renders in the project language @smoke', async ({ page, lang }) => {
+test.describe('Signup page smoke @smoke', () => {
+  test('The form renders in the project language', async ({ page, lang }) => {
     const signup = new SignupPage(page);
     await signup.goto(lang);
 
@@ -17,8 +17,8 @@ test.describe('Signup page smoke', () => {
     });
 
     await test.step(`the page is in ${lang}`, async () => {
-      expect(await signup.documentLang()).toBe(lang);
-      await expect(page).toHaveURL(new RegExp(`${SignupPage.pathFor(lang)}$`));
+      await expect(signup.html).toHaveAttribute('lang', lang);
+      await expect(page).toHaveURL(SignupPage.pathFor(lang));
     });
   });
 });

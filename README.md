@@ -28,13 +28,18 @@ npm run typecheck     # tsc, no tests
 npm run lint          # ESLint, no warnings allowed
 ```
 
-Filtering by tag uses Playwright's `--grep`, which also combines with `--project`:
+Each spec is tagged with what it covers: `@smoke`, `@labels`, `@positive`, `@language`.
+The tag sits on the `describe` block, so it applies to every test in the file. Filtering
+uses Playwright's `--grep`, which also combines with `--project`:
 
 ```bash
 npx playwright test --grep @smoke
-npx playwright test --grep "@api|@negative"
+npx playwright test --grep "@labels|@language"
 npx playwright test --grep @smoke --project=chromium-fr
 ```
+
+Everything here tests the signup page, so there is no page-level tag. If the suite ever
+covers a second page, that is when one is worth adding.
 
 Debugging:
 

@@ -17,9 +17,7 @@ test.describe('Signing up @positive', () => {
 
     // Signing up hops through a callback first and takes about 8 seconds. 20 leaves
     // room without hitting the 30s test timeout, which would hide the real failure.
-    await expect(page).toHaveURL(new RegExp(`${QuotePage.pathFor(lang)}$`), {
-      timeout: 20_000,
-    });
+    await expect(page).toHaveURL(QuotePage.pathFor(lang), { timeout: 20_000 });
 
     // A URL alone would pass on a page that failed to render.
     await expect(quotePage.heading).toHaveText(quoteCopyFor(lang).heading);

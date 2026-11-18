@@ -22,6 +22,8 @@ export class SignupPage {
   readonly loginLink: Locator;
   readonly termsLink: Locator;
   readonly heading: Locator;
+  /** The <html> element, whose lang attribute says which language the page is in. */
+  readonly html: Locator;
 
   constructor(private readonly page: Page) {
     this.firstName = page.getByTestId('first-name-input');
@@ -39,6 +41,7 @@ export class SignupPage {
     this.termsLink = page.getByTestId('terms-link');
     // Level 2 because the page has no h1 at all - see BUG-03.
     this.heading = page.getByRole('heading', { level: 2 });
+    this.html = page.locator('html');
   }
 
   /** Every control a user fills in, in the order they appear. */
@@ -90,9 +93,5 @@ export class SignupPage {
         text: option.textContent?.trim() ?? '',
       })),
     );
-  }
-
-  async documentLang(): Promise<string | null> {
-    return this.page.locator('html').getAttribute('lang');
   }
 }
