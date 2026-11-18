@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Lang } from '../lang';
+import type { TestUser } from '../data/userFactory';
 
 /**
  * The signup page. Holds locators and actions; assertions belong in the tests.
@@ -59,10 +60,37 @@ export class SignupPage {
     return lang === 'fr' ? '/fr/signup' : '/signup';
   }
 
+  /**
+   * Where a successful signup ends up, after a callback hop.
+   * The language marker is a suffix here, unlike the /fr prefix on signup itself.
+   */
+  static landingPathFor(lang: Lang): string {
+    return lang === 'fr' ? '/getaquote/fr' : '/getaquote';
+  }
+
   async goto(lang: Lang): Promise<void> {
     await this.page.goto(SignupPage.pathFor(lang));
     // The form is client-rendered, so wait for it rather than for the load event.
     await this.submit.waitFor();
+
+    // Painted is not the same as ready. Until the page's JavaScript has started up,
+    // anything typed into the form is discarded when it renders from its own state -
+    // measured at 6 attempts out of 6. Waiting for the network to go quiet is the
+    // closest signal to "the app has finished starting"; the page offers no marker of
+    // its own. Playwright discourages networkidle because a page that polls forever
+    // never reaches it; this one settles in about half a second.
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  /** Fill every field a signup needs. Consent is left alone: it is optional. */
+  async fillForm(user: TestUser): Promise<void> {
+    await this.firstName.fill(user.firstName);
+    await this.lastName.fill(user.lastName);
+    await this.phone.fill(user.phone);
+    await this.province.selectOption(user.province);
+    await this.email.fill(user.email);
+    await this.password.fill(user.password);
+    await this.passwordConfirmation.fill(user.password);
   }
 
   /** Every option in the province dropdown, in the order the page lists them. */

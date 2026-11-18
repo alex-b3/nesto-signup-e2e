@@ -49,15 +49,8 @@ test.describe('Signup fields and labels @labels', () => {
     await expect(signupPage.consent).not.toBeChecked();
     await expect(page.getByText(copy.consent)).toBeVisible();
 
-    // The page is painted before its JavaScript attaches, so an early click is either
-    // ignored or undone a second later when React renders from its own state. Retrying
-    // ticks it again once that has settled. This is BUG-01, a real defect a fast user can
-    // also hit - the retry tolerates it, it does not pretend the page is correct.
-    // The 10s cap fails a genuinely broken checkbox sooner than the 30s test timeout.
-    await expect(async () => {
-      await signupPage.consent.check();
-      await expect(signupPage.consent).toBeChecked();
-    }).toPass({ timeout: 10_000 });
+    await signupPage.consent.check();
+    await expect(signupPage.consent).toBeChecked();
   });
 
   test('the copy around the form is in the right language', async ({ signupPage, copy }) => {
