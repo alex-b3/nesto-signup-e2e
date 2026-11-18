@@ -1,11 +1,9 @@
 import type { Lang } from '../lang';
 
 /**
- * Visible copy on the signup page, taken from the running QA pages rather than retyped.
- *
- * Both languages live in one object on purpose. `lang` is a union, so TypeScript has to
- * assume either branch: reading a key that is missing from one of them does not compile.
- * A forgotten translation is a build failure instead of a confusing test failure.
+ * Visible copy on the signup page, taken from the running pages rather than retyped.
+ * Both languages in one object: `lang` is a union, so reading a key missing from either
+ * does not compile. A forgotten translation fails the build, not a test.
  */
 const copy = {
   en: {
@@ -97,10 +95,20 @@ const provinces = {
   ],
 } as const;
 
+/** Copy on the quote page, which is where a successful signup lands. */
+const quoteCopy = {
+  en: { heading: 'How can we help you with your mortgage?' },
+  fr: { heading: 'Comment peut-on vous aider avec votre hypothèque?' },
+} as const;
+
 export function copyFor(lang: Lang): (typeof copy)[Lang] {
   return copy[lang];
 }
 
 export function provincesFor(lang: Lang): readonly { value: string; text: string }[] {
   return provinces[lang];
+}
+
+export function quoteCopyFor(lang: Lang): (typeof quoteCopy)[Lang] {
+  return quoteCopy[lang];
 }

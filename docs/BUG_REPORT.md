@@ -87,3 +87,24 @@ signup page rather than on it.
 
 Worth noting separately: the two pages mark the language differently. Signup uses a
 prefix, /fr/signup, while the quote page uses a suffix, /getaquote/fr.
+
+---
+
+## BUG-03 - The signup page has no top-level heading
+
+**Severity:** Low (accessibility)
+**Where:** https://app.qa.nesto.ca/signup
+**Language:** both
+
+**Steps**
+1. Open the signup page and list its headings.
+
+**Expected:** One `<h1>` naming the page, as the quote page does.
+
+**Actual:** The only heading is an `<h2>`, "Create a nesto account". There is no `<h1>`.
+
+**Notes**
+Screen reader users navigate by headings, and jumping to the top-level heading is the
+usual way to find out what a page is for. With no `<h1>`, that shortcut lands nowhere.
+The page a signup leads to, /getaquote, does have one, so the two pages are inconsistent
+with each other.

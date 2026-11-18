@@ -3,11 +3,9 @@ import type { Lang } from '../lang';
 import type { TestUser } from '../data/userFactory';
 
 /**
- * The signup page. Holds locators and actions; assertions belong in the tests.
- *
- * Locators use `data-testid` because it is the only anchor that stays the same in English
- * and French. The `id` attributes are generated (field-2, field-4, ...) and shift with
- * render order, so they are not used.
+ * The signup page. Locators and actions only; assertions belong in the tests.
+ * Locators use `data-testid`: it is the only anchor that survives the language switch,
+ * and the generated ids (field-2, field-4, ...) shift with render order.
  */
 export class SignupPage {
   readonly firstName: Locator;
@@ -39,7 +37,8 @@ export class SignupPage {
     this.headerLogin = page.getByTestId('header-login-button');
     this.loginLink = page.getByTestId('login-link');
     this.termsLink = page.getByTestId('terms-link');
-    this.heading = page.getByRole('heading');
+    // Level 2 because the page has no h1 at all - see BUG-03.
+    this.heading = page.getByRole('heading', { level: 2 });
   }
 
   /** Every control a user fills in, in the order they appear. */
@@ -60,25 +59,15 @@ export class SignupPage {
     return lang === 'fr' ? '/fr/signup' : '/signup';
   }
 
-  /**
-   * Where a successful signup ends up, after a callback hop.
-   * The language marker is a suffix here, unlike the /fr prefix on signup itself.
-   */
-  static landingPathFor(lang: Lang): string {
-    return lang === 'fr' ? '/getaquote/fr' : '/getaquote';
-  }
-
   async goto(lang: Lang): Promise<void> {
     await this.page.goto(SignupPage.pathFor(lang));
     // The form is client-rendered, so wait for it rather than for the load event.
     await this.submit.waitFor();
 
-    // Painted is not the same as ready. Until the page's JavaScript has started up,
-    // anything typed into the form is discarded when it renders from its own state -
-    // measured at 6 attempts out of 6. Waiting for the network to go quiet is the
-    // closest signal to "the app has finished starting"; the page offers no marker of
-    // its own. Playwright discourages networkidle because a page that polls forever
-    // never reaches it; this one settles in about half a second.
+    // Painted is not ready: anything typed before the page's JavaScript starts is
+    // discarded, on 6 attempts out of 6. The page offers no readiness marker, so wait for
+    // its network to go quiet. Playwright discourages networkidle - a page that polls
+    // forever never reaches it - but this one settles in about half a second.
     await this.page.waitForLoadState('networkidle');
   }
 

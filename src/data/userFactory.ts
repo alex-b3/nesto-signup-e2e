@@ -12,12 +12,9 @@ export type TestUser = {
 };
 
 /**
- * A fresh signup user. Every call returns a different email, so tests stay independent
- * and can run in parallel.
- *
- * Accounts cannot be deleted through the signup API, so everything this suite creates
- * stays in the QA database. The name is fixed and obvious for that reason: nesto can
- * find and remove them all with one query on "Auto Suite".
+ * A fresh signup user: every call returns a different email, so tests run in parallel.
+ * Accounts cannot be deleted through the API, so the name is fixed and obvious - nesto
+ * can find everything this suite created with one query on "Auto Suite".
  */
 export function buildUser(overrides: Partial<TestUser> = {}): TestUser {
   // Timestamp groups one run together; the random part stops parallel workers colliding.
@@ -38,4 +35,12 @@ export function buildUser(overrides: Partial<TestUser> = {}): TestUser {
     province: 'QC',
     ...overrides,
   };
+}
+
+/**
+ * The initials shown in the avatar once signed in. The app upper-cases them whatever the
+ * name looked like: "zoe lowercase" shows ZL, "jean-francois o'neil" shows JO.
+ */
+export function initialsOf(user: Pick<TestUser, 'firstName' | 'lastName'>): string {
+  return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 }
