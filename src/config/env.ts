@@ -7,6 +7,6 @@ export const env = {
   baseURL: process.env.BASE_URL ?? 'https://app.qa.nesto.ca',
 
   // Must not be example.com/.org/.net or test.com: the API rejects those with
-  // 422 "placeholder email detected".
+  // 422 "placeholder email detected". See A-02.
   emailDomain: process.env.EMAIL_DOMAIN ?? 'qa-automation.test',
 } as const;

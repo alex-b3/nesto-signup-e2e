@@ -1,6 +1,7 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Locator, Page, Response } from '@playwright/test';
 import type { Lang } from '../lang';
 import type { TestUser } from '../data/userFactory';
+import { isCreateAccountCall } from '../api/signupEndpoint';
 
 /**
  * The signup page. Locators and actions only; assertions belong in the tests.
@@ -70,7 +71,7 @@ export class SignupPage {
     // Painted is not ready: anything typed before the page's JavaScript starts is
     // discarded, on 6 attempts out of 6. The page offers no readiness marker, so wait for
     // its network to go quiet. Playwright discourages networkidle - a page that polls
-    // forever never reaches it - but this one settles in about half a second.
+    // forever never reaches it - but this one settles in about half a second. See T-03.
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -83,6 +84,21 @@ export class SignupPage {
     await this.email.fill(user.email);
     await this.password.fill(user.password);
     await this.passwordConfirmation.fill(user.password);
+  }
+
+  /**
+   * Submit the form and hand back the create-account call it makes. Listening starts
+   * before the click, or a quick response would be gone before anyone is waiting.
+   */
+  async submitAndCaptureCreateCall(): Promise<Response> {
+    const [response] = await Promise.all([
+      this.page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' && isCreateAccountCall(response.url()),
+      ),
+      this.submit.click(),
+    ]);
+    return response;
   }
 
   /** Every option in the province dropdown, in the order the page lists them. */

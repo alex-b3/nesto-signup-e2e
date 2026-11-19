@@ -90,10 +90,28 @@ Locators are `data-testid`, because that is the only anchor that stays the same 
 English and French. The page's `id` attributes are generated (`field-2`, `field-4`,
 …) and move with render order, so they are not used.
 
+## Documents
+
+- `docs/ASSUMPTIONS.md` - what the brief left open, what I decided, and what breaks if I
+  was wrong. Code that depends on one carries an `A-xx` or `T-xx` comment.
+- `docs/BUG_REPORT.md` - issues found while building the suite, with steps to reproduce.
+
 ## What is here so far
 
-A smoke test covering that the signup form renders in both languages, on the
-framework described above. Field, validation and API coverage is being added next.
+22 tests across both languages: the form renders, every field is labelled, the province
+list is complete, the consent box is opt-in, the language toggle works and keeps what has
+been typed, a valid signup signs the new user in, and the create-account API returns 201
+with the entered data. Negative cases are next.
+
+## How AI was used
+
+Claude Code was used as an assistant for scaffolding and drafting code. Test design,
+scope and the assumptions are mine. Every change was reviewed before committing, and a
+fair number were rejected or rewritten - a discovery script and a set of documents were
+dropped as unrequested, a readiness wait was replaced because it measured the wrong
+thing, and a comment in `src/api/signupEndpoint.ts` claiming certain payload fields were
+required turned out to be wrong when I tested it. Commits carry a `Co-Authored-By`
+trailer so the record is plain.
 
 ## What I would add next
 
