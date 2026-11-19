@@ -52,7 +52,8 @@ would point straight at the factory.
 The requirement can mean the endpoint's own contract - send those fields, check they come
 back - or the round trip that starts at the form. Both are tested, in
 `signup-api.spec.ts`. The second is not redundant: the API stores whatever phone format it
-is given (`5145550123` and `514-555-0123` are both accepted and stored verbatim), so the
+is given (`5145550123` and `514-555-0123` are both accepted and stored verbatim, see
+BUG-06), so the
 `+1` is added by the page, not the server. The same goes for the form's province arriving
 as `region` and the page's language arriving as `preferredLanguage`. A test that builds
 its own payload cannot notice if the page stops doing any of that.
@@ -61,8 +62,8 @@ missing.
 
 **A-07 - Where the application looks wrong, the test asserts what it does today.**
 A duplicate email returns `400 "bad format"` where `409 Conflict` would fit. I assumed my
-job is to describe current behaviour accurately and report the disagreement separately,
-not to write a test that fails every run.
+job is to describe current behaviour accurately and report the disagreement separately
+(BUG-07), not to write a test that fails every run.
 *If I am wrong,* or when it is fixed: the test fails, which is when someone should look.
 
 **A-08 - Arriving directly at `/fr/signup` is the same as clicking the toggle.**

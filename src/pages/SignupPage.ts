@@ -87,6 +87,24 @@ export class SignupPage {
   }
 
   /**
+   * Start recording create-account calls, and hand back the list they land in. Used by
+   * the negative tests: the form is expected to refuse before anything is sent, and a
+   * message on screen is not proof of that on its own.
+   *
+   * The listener is never removed because the page is thrown away at the end of the
+   * test, which takes the listener with it.
+   */
+  recordCreateAccountCalls(): string[] {
+    const calls: string[] = [];
+    this.page.on('request', (request) => {
+      if (request.method() === 'POST' && isCreateAccountCall(request.url())) {
+        calls.push(request.url());
+      }
+    });
+    return calls;
+  }
+
+  /**
    * Submit the form and hand back the create-account call it makes. Listening starts
    * before the click, or a quick response would be gone before anyone is waiting.
    */

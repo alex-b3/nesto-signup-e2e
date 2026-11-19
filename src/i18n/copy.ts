@@ -95,6 +95,36 @@ const provinces = {
   ],
 } as const;
 
+/**
+ * Validation messages, taken from the running pages. Which message a field gives is not
+ * consistent: an empty name says it is required, an empty email says the address is
+ * invalid, and an empty password complains about its length. See BUG-10.
+ */
+const errors = {
+  en: {
+    fieldRequired: 'The field is required',
+    invalidEmail: 'Invalid email',
+    invalidName: 'Invalid name',
+    // "letters" is wrong - a password has to contain a digit, so it cannot be 12
+    // letters. The hint above the field says "characters". See BUG-09.
+    passwordTooShort: 'Minimum of 12 letters required',
+    passwordTooLong: 'Maximum of 32 letters required',
+    passwordWeak:
+      'Password must contain at least one uppercase letter, one lowercase letter and one number',
+    passwordsDiffer: 'Passwords do not match',
+  },
+  fr: {
+    fieldRequired: 'Ce champ est obligatoire.',
+    invalidEmail: 'Courriel invalide',
+    invalidName: 'Nom invalide',
+    passwordTooShort: 'Minimum de 12 lettres requises',
+    passwordTooLong: 'Maximum de 32 lettres requises',
+    passwordWeak:
+      'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule et un chiffre',
+    passwordsDiffer: 'Les mots de passe ne correspondent pas',
+  },
+} as const;
+
 /** Copy on the quote page, which is where a successful signup lands. */
 const quoteCopy = {
   en: { heading: 'How can we help you with your mortgage?' },
@@ -111,4 +141,8 @@ export function provincesFor(lang: Lang): readonly { value: string; text: string
 
 export function quoteCopyFor(lang: Lang): (typeof quoteCopy)[Lang] {
   return quoteCopy[lang];
+}
+
+export function errorsFor(lang: Lang): (typeof errors)[Lang] {
+  return errors[lang];
 }

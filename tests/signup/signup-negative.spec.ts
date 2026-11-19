@@ -1,0 +1,151 @@
+import { test, expect } from '../../src/fixtures/test';
+import { buildUser } from '../../src/data/userFactory';
+import { errorsFor } from '../../src/i18n/copy';
+import { CREATE_ACCOUNT_PATH, buildCreateAccountPayload } from '../../src/api/signupEndpoint';
+
+test.describe('Signup validation @negative', () => {
+  test('an empty form is refused and nothing is sent', async ({ signupPage, page, lang }) => {
+    const errors = errorsFor(lang);
+    const sent = signupPage.recordCreateAccountCalls();
+
+    await signupPage.submit.click();
+    await expect(page.getByText(errors.fieldRequired).first()).toBeVisible();
+
+    // The message matters less than this: the form has to refuse before it asks the
+    // server. If it ever submitted anyway, an account would be created with nothing in
+    // it, and a test looking only at messages would not notice.
+    expect(sent).toHaveLength(0);
+  });
+
+  test.describe('required fields', () => {
+    const required = [
+      { field: 'firstName', message: 'fieldRequired' },
+      { field: 'email', message: 'invalidEmail' },
+      { field: 'password', message: 'passwordTooShort' },
+    ] as const;
+
+    for (const { field, message } of required) {
+      test(`${field} is required on its own`, async ({ signupPage, page, lang }) => {
+        const errors = errorsFor(lang);
+        const sent = signupPage.recordCreateAccountCalls();
+        // Everything else valid, so the missing field is the only possible reason.
+        await signupPage.fillForm(buildUser({ [field]: '' }));
+
+        await signupPage.submit.click();
+        await expect(page.getByText(errors[message]).first()).toBeVisible();
+        expect(sent).toHaveLength(0);
+      });
+    }
+
+    test('a name containing digits is refused', async ({ signupPage, page, lang }) => {
+      const errors = errorsFor(lang);
+      const sent = signupPage.recordCreateAccountCalls();
+      // This rule is why the user factory cannot put a run id in a name.
+      await signupPage.fillForm(buildUser({ firstName: 'Auto123' }));
+
+      await signupPage.submit.click();
+      await expect(page.getByText(errors.invalidName).first()).toBeVisible();
+      expect(sent).toHaveLength(0);
+    });
+  });
+
+  test.describe('password rules', () => {
+    const passwords = [
+      { case: 'one character short', password: 'Short123abc', message: 'passwordTooShort' },
+      {
+        case: 'one character too long',
+        password: `A1${'a'.repeat(31)}`,
+        message: 'passwordTooLong',
+      },
+      { case: 'no uppercase letter', password: 'alllowercase123', message: 'passwordWeak' },
+      { case: 'no digit', password: 'NoDigitsHereOk', message: 'passwordWeak' },
+    ] as const;
+
+    for (const rule of passwords) {
+      test(`a password with ${rule.case} is refused`, async ({ signupPage, page, lang }) => {
+        const errors = errorsFor(lang);
+        const sent = signupPage.recordCreateAccountCalls();
+        await signupPage.fillForm(buildUser({ password: rule.password }));
+
+        await signupPage.submit.click();
+        await expect(page.getByText(errors[rule.message]).first()).toBeVisible();
+        expect(sent).toHaveLength(0);
+      });
+    }
+  });
+
+  test.describe('password confirmation', () => {
+    // The confirmation is compared exactly: a different case or a stray trailing space is
+    // still a mismatch. Worth pinning down - trimming one field and not the other would
+    // reject two passwords that look identical on screen, and comparing them
+    // case-insensitively would quietly weaken every password on the site.
+    const confirmations = [
+      { case: 'is empty', confirmation: () => '' },
+      { case: 'is a different password', confirmation: () => 'DifferentPass123' },
+      { case: 'differs only by case', confirmation: (password: string) => password.toLowerCase() },
+      { case: 'has a trailing space', confirmation: (password: string) => `${password} ` },
+    ] as const;
+
+    for (const variant of confirmations) {
+      test(`a confirmation that ${variant.case} is refused`, async ({
+        signupPage,
+        page,
+        lang,
+      }) => {
+        const errors = errorsFor(lang);
+        const user = buildUser();
+        const sent = signupPage.recordCreateAccountCalls();
+
+        await signupPage.fillForm(user);
+        await signupPage.passwordConfirmation.fill(variant.confirmation(user.password));
+
+        await signupPage.submit.click();
+        await expect(page.getByText(errors.passwordsDiffer)).toBeVisible();
+        expect(sent).toHaveLength(0);
+      });
+    }
+  });
+
+  test.describe('email format', () => {
+    const badEmails = [
+      'not-an-email',
+      'missing-at-sign.com',
+      '@no-local-part.com',
+      'spaces in@mail.test',
+    ];
+
+    for (const email of badEmails) {
+      test(`"${email}" is refused as an email`, async ({ signupPage, page, lang }) => {
+        const errors = errorsFor(lang);
+        const sent = signupPage.recordCreateAccountCalls();
+        await signupPage.fillForm(buildUser({ email }));
+
+        await signupPage.submit.click();
+        await expect(page.getByText(errors.invalidEmail).first()).toBeVisible();
+        expect(sent).toHaveLength(0);
+      });
+    }
+  });
+
+  test('an address that is already registered is refused', async ({
+    signupPage,
+    request,
+    lang,
+  }) => {
+    const user = buildUser();
+    // The first account only has to exist. Creating it without a browser keeps this test
+    // about the second attempt.
+    const first = await request.post(CREATE_ACCOUNT_PATH, {
+      data: buildCreateAccountPayload(user, lang),
+    });
+    expect(first.ok()).toBe(true);
+
+    await signupPage.fillForm(user);
+    const second = await signupPage.submitAndCaptureCreateCall();
+
+    // 400 "bad format" is what the API answers today, where 409 would fit a duplicate.
+    // Asserting what it should be would fail every run and tell nobody anything, so the
+    // disagreement lives in the bug report instead. See A-07.
+    expect(second.status()).toBe(400);
+  });
+});
