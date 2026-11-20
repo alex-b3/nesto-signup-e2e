@@ -28,14 +28,15 @@ npm run typecheck     # tsc, no tests
 npm run lint          # ESLint, no warnings allowed
 ```
 
-Each spec is tagged with what it covers: `@smoke`, `@labels`, `@positive`, `@language`.
+Each spec is tagged with what it covers: `@labels`, `@positive`, `@negative`,
+`@language`, `@api`.
 The tag sits on the `describe` block, so it applies to every test in the file. Filtering
 uses Playwright's `--grep`, which also combines with `--project`:
 
 ```bash
-npx playwright test --grep @smoke
+npx playwright test --grep @negative
 npx playwright test --grep "@labels|@language"
-npx playwright test --grep @smoke --project=chromium-fr
+npx playwright test --grep @positive --project=chromium-fr
 ```
 
 Everything here tests the signup page, so there is no page-level tag. If the suite ever

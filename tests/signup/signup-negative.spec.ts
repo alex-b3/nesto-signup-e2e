@@ -107,12 +107,9 @@ test.describe('Signup validation @negative', () => {
   });
 
   test.describe('email format', () => {
-    const badEmails = [
-      'not-an-email',
-      'missing-at-sign.com',
-      '@no-local-part.com',
-      'spaces in@mail.test',
-    ];
+    // One with no @ at all, one that looks almost right. The other shapes I tried -
+    // a missing local part, a second address with no @ - all gave the same message.
+    const badEmails = ['not-an-email', 'spaces in@mail.test'];
 
     for (const email of badEmails) {
       test(`"${email}" is refused as an email`, async ({ signupPage, page, lang }) => {
