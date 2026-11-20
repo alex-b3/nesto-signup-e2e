@@ -3,18 +3,23 @@
 Playwright + TypeScript tests for the nesto signup page in the QA environment,
 running in both English and French.
 
-## Requirements
+## Quick start
 
-Node 20 or newer.
-
-## Install
+You need git and Node 20 or newer. Then:
 
 ```bash
+git clone https://github.com/alex-b3/nesto-signup-e2e.git
+cd nesto-signup-e2e
 npm ci
 npx playwright install chromium
+npm test
+npm run report
 ```
 
-No further setup. The suite points at `https://app.qa.nesto.ca` by default.
+No accounts, keys or `.env` file are needed: the suite points at
+`https://app.qa.nesto.ca` by default. On Linux, use
+`npx playwright install --with-deps chromium` so the system libraries the browser
+needs are installed too.
 
 ## Run
 
@@ -97,12 +102,22 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
   was wrong. Code that depends on one carries an `A-xx` or `T-xx` comment.
 - `docs/BUG_REPORT.md` - issues found while building the suite, with steps to reproduce.
 
-## What is here so far
+## What the brief asked for, and where it is
 
-22 tests across both languages: the form renders, every field is labelled, the province
-list is complete, the consent box is opt-in, the language toggle works and keeps what has
-been typed, a valid signup signs the new user in, and the create-account API returns 201
-with the entered data. Negative cases are next.
+35 tests, each run in English and French.
+
+| The brief asks for | Where |
+|---|---|
+| Positive test cases | `tests/signup/signup-positive.spec.ts` - 9 tests |
+| Negative test cases | `tests/signup/signup-negative.spec.ts` - 16 tests |
+| Coverage of fields and labels | `tests/signup/fields-and-labels.spec.ts` - 5 tests |
+| The create-account API returns 201 and the body contains what was entered | `tests/signup/signup-api.spec.ts` - 3 tests, through the form and on its own (A-06) |
+| Running in French and English | `playwright.config.ts` - one project per language; `tests/signup/language-switch.spec.ts` - 2 tests for the toggle |
+| Assumptions written down alongside the code | `docs/ASSUMPTIONS.md`, with `A-xx` comments where the code depends on one |
+| TypeScript | strict mode, `tsconfig.json` |
+| A short bug report | `docs/BUG_REPORT.md` |
+| How to install and run | Quick start, above |
+| What I would add next | below |
 
 ## How AI was used
 
