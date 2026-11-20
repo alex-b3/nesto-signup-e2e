@@ -12,6 +12,8 @@ export class SignupPage {
   readonly firstName: Locator;
   readonly lastName: Locator;
   readonly phone: Locator;
+  /** Country for the phone number. No test id, so it is found by the name it submits under. */
+  readonly phoneCountry: Locator;
   readonly province: Locator;
   readonly email: Locator;
   readonly password: Locator;
@@ -30,6 +32,7 @@ export class SignupPage {
     this.firstName = page.getByTestId('first-name-input');
     this.lastName = page.getByTestId('last-name-input');
     this.phone = page.getByTestId('phoneInput');
+    this.phoneCountry = page.locator('select[name="phoneCountry"]');
     this.province = page.getByTestId('region-select');
     this.email = page.getByTestId('email-input');
     this.password = page.getByTestId('password-input');
@@ -109,14 +112,15 @@ export class SignupPage {
    * before the click, or a quick response would be gone before anyone is waiting.
    */
   async submitAndCaptureCreateCall(): Promise<Response> {
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (response) =>
-          response.request().method() === 'POST' && isCreateAccountCall(response.url()),
-      ),
-      this.submit.click(),
-    ]);
+    const [response] = await Promise.all([this.waitForCreateAccountCall(), this.submit.click()]);
     return response;
+  }
+
+  /** Wait for the create-account call, however it was triggered. */
+  waitForCreateAccountCall(): Promise<Response> {
+    return this.page.waitForResponse(
+      (response) => response.request().method() === 'POST' && isCreateAccountCall(response.url()),
+    );
   }
 
   /** Every option in the province dropdown, in the order the page lists them. */

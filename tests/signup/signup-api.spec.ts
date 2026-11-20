@@ -67,4 +67,17 @@ test.describe('Create-account API @api', () => {
       expect(account.leadDistributeConsentAgreement).toBe(false);
     });
   });
+
+  test('the phone country chooses the dialling code that is sent', async ({ signupPage }) => {
+    const user = buildUser();
+    await signupPage.fillForm(user);
+    // France rather than the default Canada, so the code sent has to change with it.
+    await signupPage.phoneCountry.selectOption('FR');
+
+    const response = await signupPage.submitAndCaptureCreateCall();
+    expect(response.status()).toBe(HTTP_CREATED);
+
+    const sent = response.request().postDataJSON() as CreateAccountRequest;
+    expect(sent.phone).toBe(`+33${user.phone}`);
+  });
 });

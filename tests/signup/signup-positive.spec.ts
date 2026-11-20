@@ -114,4 +114,31 @@ test.describe('Signing up @positive', () => {
       });
     }
   });
+
+  test('pressing Enter in a field submits the form', async ({ signupPage }) => {
+    const user = buildUser();
+    await signupPage.fillForm(user);
+
+    // Plenty of people never reach for the button. If the keyboard path ever stopped
+    // matching the click path, nothing else in the suite would notice.
+    const [response] = await Promise.all([
+      signupPage.waitForCreateAccountCall(),
+      signupPage.email.press('Enter'),
+    ]);
+    expect(response.status()).toBe(HTTP_CREATED);
+  });
+
+  test('clicking submit repeatedly creates one account', async ({ signupPage }) => {
+    await signupPage.fillForm(buildUser());
+    const sent = signupPage.recordCreateAccountCalls();
+
+    await signupPage.submit.click({ clickCount: 3, delay: 20 });
+
+    // Disabling the button is how the form guards itself, so that is what to wait for.
+    // It stays on screen while the browser leaves for the identity provider.
+    await expect(signupPage.submit).toBeDisabled();
+
+    // An impatient customer should not end up with three accounts.
+    expect(sent).toHaveLength(1);
+  });
 });
