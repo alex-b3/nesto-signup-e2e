@@ -72,6 +72,21 @@ per project rather than clicking through the UI in every test.
 *If I am wrong,* something set only by the click would be missed - one test clicks it for
 real, which would catch that.
 
+**A-09 - Signing in is worth testing even though the sign-in page is not nesto's.**
+The brief covers the signup page, and signing in is served by Auth0 on its own domain. I
+included one test anyway, because nothing else in the suite ever uses the password:
+signing up hands back a token, so every other test would pass on an account nobody could
+sign into. The API will create an account with no password at all (BUG-04), so "created"
+and "usable" are genuinely different states here.
+
+The test reaches the page by pressing Login rather than by building the address, so the
+application supplies the parameters Auth0 needs - visiting the address directly gives an
+empty page. The fields are found by their `name`, which is what the form submits under;
+there are no test ids on that page.
+*If I am wrong,* and this is considered out of scope, it is one test to remove. The risk I
+accept is that it depends on a system nesto does not own: if Auth0 is reconfigured, this
+fails for a reason unrelated to signup.
+
 ---
 
 ## Trade-offs
