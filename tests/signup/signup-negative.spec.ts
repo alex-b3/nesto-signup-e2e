@@ -47,6 +47,20 @@ test.describe('Signup validation @negative', () => {
       await expect(page.getByText(errors.invalidName).first()).toBeVisible();
       expect(sent).toHaveLength(0);
     });
+
+    for (const field of ['firstName', 'lastName'] as const) {
+      test(`a ${field} containing HTML is refused`, async ({ signupPage, page, lang }) => {
+        const errors = errorsFor(lang);
+        const sent = signupPage.recordCreateAccountCalls();
+        // The API stores markup as given (BUG-06), so only the form refuses it, and anyone can
+        // skip the form by calling the API directly. Bold rather than a script: nothing would run.
+        await signupPage.fillForm(buildUser({ [field]: '<b>x</b>' }));
+
+        await signupPage.submit.click();
+        await expect(page.getByText(errors.invalidName).first()).toBeVisible();
+        expect(sent).toHaveLength(0);
+      });
+    }
   });
 
   test.describe('password rules', () => {

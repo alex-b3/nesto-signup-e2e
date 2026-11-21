@@ -21,6 +21,9 @@ test.describe('Create-account API @api', () => {
 
     const response = await request.post(CREATE_ACCOUNT_PATH, { data: payload });
     expect(response.status()).toBe(HTTP_CREATED);
+    // The reply is the whole new account; a password, if it ever appeared, would be visible
+    // in the browser and in anything that logs responses.
+    expect(await response.text()).not.toContain(user.password);
 
     const { account } = (await response.json()) as CreateAccountResponse;
     expect(account.firstName).toBe(user.firstName);

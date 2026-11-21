@@ -107,7 +107,38 @@ question for the team.
 
 **Severity:** Medium · **Where:** `POST /api/accounts`
 
-**Steps** - send each directly to the endpoint:
+**Steps** - with Postman, curl or any HTTP client:
+1. `POST https://app.qa.nesto.ca/api/accounts` with header `Content-Type: application/json`
+   and this body. No cookie or token is needed. The email must not be in use yet, so
+   change it on every run.
+   ```json
+   {
+     "firstName": "<b>x</b>",
+     "lastName": "Repro",
+     "email": "bug06-repro-1@qa-automation.test",
+     "phone": "+15145550123",
+     "region": "QC",
+     "language": "en",
+     "leadDistributeConsentAgreement": false,
+     "password": "AutoTest1234",
+     "passwordSpecified": true,
+     "createdAt": "LOGIN",
+     "partner": "nesto",
+     "formName": "signup"
+   }
+   ```
+   The same as one command:
+   ```bash
+   curl -i -X POST https://app.qa.nesto.ca/api/accounts \
+     -H 'Content-Type: application/json' \
+     -d '{"firstName":"<b>x</b>","lastName":"Repro","email":"bug06-repro-1@qa-automation.test","phone":"+15145550123","region":"QC","language":"en","leadDistributeConsentAgreement":false,"password":"AutoTest1234","passwordSpecified":true,"createdAt":"LOGIN","partner":"nesto","formName":"signup"}'
+   ```
+2. The reply is `201 Created` and `account.firstName` is `<b>x</b>`, stored as sent.
+3. For the other rows below, change that one field in the same body.
+
+Without any tool: submit the form once with valid data, then in the browser's developer
+tools right-click the `POST /api/accounts` request, "Copy as fetch", change a field and
+run it in the console.
 
 | Sent | API | The form |
 |---|---|---|
@@ -120,7 +151,13 @@ question for the team.
 
 **Expected:** The API enforces at least the form's rules.
 
-**Why it matters:** This is why the negative tests check that no request was sent, not
+**Evidence:** the `<script>` row was sent once, on 2026-11-17. The reply was `201 Created`
+for account id `1066321`, with `"firstName": "<script>alert(1)</script>"`. Accounts cannot
+be deleted, so it can still be looked up. The repro above uses `<b>x</b>` instead: it
+shows the same thing and nothing in it can run.
+
+**Why it matters:** Anyone can skip the form, as shown above, and nothing on the server
+stops that (BUG-05). This is why the negative tests check that no request was sent, not
 only that a message appeared. The `<script>` value is stored as given; I did not test
 whether it is escaped where it is later shown.
 
