@@ -34,7 +34,7 @@ npm run lint          # ESLint, no warnings allowed
 ```
 
 Each spec is tagged with what it covers: `@labels`, `@positive`, `@negative`,
-`@language`, `@api`.
+`@language`, `@api`, `@visual`.
 The tag sits on the `describe` block, so it applies to every test in the file. Filtering
 uses Playwright's `--grep`, which also combines with `--project`:
 
@@ -53,6 +53,24 @@ Debugging:
 npx playwright test --headed     # watch the browser
 npx playwright test --debug      # step through, with the inspector
 ```
+
+## Visual tests
+
+`tests/signup/signup-visual.spec.ts` compares the form, empty and with its error
+messages, against screenshots kept in the repo next to it
+(`signup-visual.spec.ts-snapshots/`). A difference fails the test, and the HTML report
+shows the expected image, the actual one, and the difference highlighted.
+
+Fonts render differently on each operating system, so the baselines were recorded on
+macOS and these tests are skipped elsewhere. After an intended change to the page,
+record new baselines and commit them:
+
+```bash
+npx playwright test --grep @visual --update-snapshots
+```
+
+The error screenshot shows the current messages, including BUG-09 and BUG-10, so
+fixing either one will need new baselines.
 
 ## Both languages
 
@@ -121,7 +139,7 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
 
 ## What the brief asked for, and where it is
 
-38 tests, each run in English and French.
+40 tests, each run in English and French.
 
 | The brief asks for | Where |
 |---|---|

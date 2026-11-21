@@ -25,6 +25,7 @@ export class SignupPage {
   readonly loginLink: Locator;
   readonly termsLink: Locator;
   readonly heading: Locator;
+  readonly form: Locator;
   /** The <html> element, whose lang attribute says which language the page is in. */
   readonly html: Locator;
 
@@ -45,6 +46,8 @@ export class SignupPage {
     this.termsLink = page.getByTestId('terms-link');
     // Level 2 because the page has no h1 at all - see BUG-03.
     this.heading = page.getByRole('heading', { level: 2 });
+    // The page has one <form> and it has no test id.
+    this.form = page.locator('form');
     this.html = page.locator('html');
   }
 

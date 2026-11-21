@@ -30,6 +30,11 @@ export default tseslint.config(
     files: ['tests/**/*.ts'],
     ...playwright.configs['flat/recommended'],
   },
+  {
+    files: ['tests/**/*.ts'],
+    // A skip with a condition is a decision; a bare skip is usually a forgotten one.
+    rules: { 'playwright/no-skipped-test': ['warn', { allowConditional: true }] },
+  },
 
   // The config file is not part of the TypeScript project.
   { files: ['eslint.config.mjs'], ...tseslint.configs.disableTypeChecked },
