@@ -15,7 +15,7 @@ test.describe('Signup form appearance @visual', () => {
   test.use({ viewport: { width: 1280, height: 1200 } });
 
   test.beforeEach(async ({ signupPage }) => {
-    // The default province depends on where the test runs (A-04), so pin it.
+    // The default province cannot be relied on (A-04), so pin it.
     await signupPage.province.selectOption('QC');
   });
 

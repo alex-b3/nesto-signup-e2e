@@ -12,5 +12,5 @@ node_modules/
 .env.*
 !.env.example
 
-# Raw page/network dumps from scripts/discover.ts (may contain test account data)
+# Local exploration notes and page dumps (may contain test account data)
 /discovery/

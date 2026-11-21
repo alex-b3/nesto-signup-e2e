@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as path from 'node:path';
 
-dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env'), quiet: true });
 
 export const env = {
   baseURL: process.env.BASE_URL ?? 'https://app.qa.nesto.ca',

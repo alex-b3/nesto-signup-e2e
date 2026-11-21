@@ -173,7 +173,8 @@ test.describe('Signup validation @negative', () => {
     page,
     context,
   }) => {
-    const isThirdParty = (url: string) => !new URL(url).hostname.endsWith('nesto.ca');
+    // nesto.ca or any subdomain of it, but not a lookalike such as evilnesto.ca.
+    const isThirdParty = (url: string) => !/(^|\.)nesto\.ca$/.test(new URL(url).hostname);
     const thirdPartyRequests: string[] = [];
     context.on('request', (request) => {
       if (isThirdParty(request.url())) {

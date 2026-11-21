@@ -53,11 +53,20 @@ test.describe('Signup fields and labels @labels', () => {
     await expect(signupPage.consent).toBeChecked();
   });
 
-  test('the copy around the form is in the right language', async ({ signupPage, copy }) => {
+  test('the copy around the form is in the right language', async ({
+    signupPage,
+    copy,
+    page,
+  }) => {
     await expect(signupPage.heading).toHaveText(copy.heading);
     await expect(signupPage.submit).toHaveText(copy.submit);
+    await expect(page.getByText(copy.alreadyHaveAccount)).toBeVisible();
     await expect(signupPage.loginLink).toHaveText(copy.logIn);
+    await expect(page.getByText(copy.termsIntro)).toBeVisible();
     await expect(signupPage.termsLink).toHaveText(copy.termsLink);
+    await expect(page.getByText(copy.privacyIntro)).toBeVisible();
+    await expect(page.getByRole('link', { name: copy.privacyLink })).toBeVisible();
+    await expect(page.getByText(copy.privacyOutro)).toBeVisible();
     await expect(signupPage.headerLogin).toHaveText(copy.headerLogin);
     // The toggle offers the other language, so French is advertised on the English page.
     await expect(signupPage.languageSwitch).toHaveText(copy.languageSwitch);
