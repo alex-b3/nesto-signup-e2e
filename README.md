@@ -166,8 +166,11 @@ trailer so the record is plain.
 
 ## What I would add next
 
-- GitHub Actions running both languages on every push, with the HTML report kept
-  as an artifact.
+- A GitHub Actions workflow: lint, typecheck and both languages on every push, with the
+  HTML report kept as a download. Started by hand, it would offer a choice for
+  `FAIL_ON_PAGE_ERRORS`, off by default, so a manual run reports page errors without
+  failing. Not switched on here because every run creates permanent accounts in nesto's
+  QA environment (28 per run, A-01), which I would want nesto to agree to first.
 - Cross-browser (Firefox, WebKit) and mobile viewports, on a schedule rather than
   on every commit.
 - An accessibility pass with `@axe-core/playwright` in both languages.
