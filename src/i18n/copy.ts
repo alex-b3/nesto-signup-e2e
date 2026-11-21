@@ -37,7 +37,7 @@ const copy = {
     email: 'Courriel',
     password: 'Mot de passe',
     // "doit contenir au entre" is not grammatical; the English reads correctly.
-    // Asserted as-is so the suite describes the page that exists. Reported separately.
+    // Asserted as-is so the suite describes the page that exists. See BUG-12.
     passwordHint: 'Le mot de passe doit contenir au entre 12 et 32 caractères et contenir au moins une lettre majuscule, une lettre minuscule et un chiffre.',
     passwordConfirmation: 'Confirmation du mot de passe',
     consent: 'En cochant cette case, vous acceptez d’être contacté par les partenaires de nesto dans le but de vous proposer des produits financiers. Vous acceptez que nesto partage vos informations de demande hypothécaire avec ses partenaires, si nous ne sommes pas en mesure de vous fournir nos services. Vous pouvez vous désinscrire à tout moment.',
@@ -65,7 +65,7 @@ const provinces = {
     { value: 'QC', text: 'Quebec' },
     { value: 'AB', text: 'Alberta' },
     // Hyphenated, unlike every other English province name. Looks like the French
-    // form (Colombie-Britannique) leaking across. Asserted as-is and reported.
+    // form (Colombie-Britannique) leaking across. Asserted as-is. See BUG-13.
     { value: 'BC', text: 'British-Columbia' },
     { value: 'MB', text: 'Manitoba' },
     { value: 'NB', text: 'New Brunswick' },

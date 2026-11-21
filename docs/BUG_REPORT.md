@@ -78,28 +78,34 @@ Here that shortcut lands nowhere.
 
 **Expected:** Refused.
 
-**Actual:** `201 Created`, with a working access token in the reply.
+**Actual:** `201 Created`, with an access token for the new account in the reply.
 
 **Why it matters:** The form always sends a password, but the endpoint can be called
 without a browser and has no protection (BUG-05), so the form is the only thing enforcing
-the rule. I did not test whether such an account can later sign in.
+the rule. Rated High because an account exists that nobody set a password for, and the
+reply hands out a token for it. I did not check whether that token works or whether the
+account can sign in later; the sign-in page needs a password, and I did not try other ways.
 
 ---
 
-## BUG-05 - The signup API has no CSRF protection, CAPTCHA or rate limiting
+## BUG-05 - The signup API shows no bot protection or throttling
 
 **Severity:** Medium · **Where:** `POST /api/accounts`
 
 **Steps**
 1. From any HTTP client, with no browser, cookies or token, post a valid payload.
 
-**Expected:** Some protection against automated account creation.
+**Expected:** Some protection against automated account creation, such as a CAPTCHA or a
+rate limit.
 
-**Actual:** `201 Created` every time. About twenty accounts were created in a few seconds
-while probing validation, with no throttling or challenge.
+**Actual:** `201 Created` every time, with no CAPTCHA, challenge or token asked for. About
+twenty accounts were created in a few seconds while probing validation, without being
+slowed down.
 
-**Notes:** The suite relies on this, but so could abuse. Whether production blocks it is a
-question for the team.
+**Notes:** A limit above that rate cannot be ruled out; I did not look for one, so as not
+to flood the environment. CSRF protection is left out on purpose: the call uses no
+cookies, so there is no session to abuse. The suite relies on this openness, but so could
+abuse. Whether production blocks it is a question for the team.
 
 ---
 
@@ -233,3 +239,58 @@ empty password    ->  Minimum of 12 letters required  wrong problem
 ```
 
 **Notes:** Only the name fields say what is actually wrong.
+
+---
+
+## BUG-11 - The page sends no Content-Security-Policy
+
+**Severity:** Low (defence in depth) · **Where:** response headers of /signup
+
+**Steps**
+1. `curl -s -D - -o /dev/null https://app.qa.nesto.ca/signup`, or look at the page's
+   response headers in the browser's developer tools.
+
+**Expected:** A `Content-Security-Policy` header saying where scripts may come from.
+
+**Actual:** None. The other security headers are there: `Strict-Transport-Security`
+(two years, subdomains included), `X-Content-Type-Options: nosniff`,
+`X-Frame-Options: DENY` (sent twice, harmless), and the one cookie is `Secure`,
+`HttpOnly` and `SameSite=lax`. Checked 2026-11-20.
+
+**Why it matters:** A policy stops an injected script from running even where a screen
+forgets to escape a value. With markup getting into stored names (BUG-06), that safety
+net matters more. Adding one is not trivial: the page loads scripts from Google Tag Manager
+and Didomi and sends data to Datadog, all of which the policy would have to allow.
+
+---
+
+## BUG-12 - The French password hint is not grammatical
+
+**Severity:** Low (copy) · **Where:** signup form · **Language:** French
+
+**Steps**
+1. Open https://app.qa.nesto.ca/fr/signup and read the hint under "Mot de passe".
+
+**Expected:** "Le mot de passe doit contenir entre 12 et 32 caractères et contenir au moins
+une lettre majuscule, une lettre minuscule et un chiffre."
+
+**Actual:** "Le mot de passe doit contenir **au entre** 12 et 32 caractères …"
+
+**Notes:** "au entre" is not French; the English hint reads correctly. The suite asserts
+the text as it is, so a fix needs `src/i18n/copy.ts` and the visual baselines updated.
+
+---
+
+## BUG-13 - "British-Columbia" is hyphenated in the English province list
+
+**Severity:** Low (copy) · **Where:** province dropdown · **Language:** English
+
+**Steps**
+1. Open https://app.qa.nesto.ca/signup and open "Province of purchase".
+
+**Expected:** "British Columbia", written like "New Brunswick" and "Nova Scotia".
+
+**Actual:** "British-Columbia".
+
+**Notes:** It looks like the French form, "Colombie-Britannique", carried over. The value
+sent is still `BC`, so only the label is wrong. The suite asserts it as it is.
