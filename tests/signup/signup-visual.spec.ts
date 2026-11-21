@@ -9,6 +9,9 @@ test.describe('Signup form appearance @visual', () => {
   // Fonts render differently on each operating system, so a baseline recorded on one
   // fails on another. The baselines here were recorded on macOS.
   test.skip(process.platform !== 'darwin', 'visual baselines are recorded on macOS only');
+  // A visible browser is a different Chromium build and renders text slightly
+  // differently: the form comes out 2px shorter, so it can never match.
+  test.skip(({ headless }) => !headless, 'visual baselines are recorded without --headed');
 
   // Tall enough for the whole form. In the default 720px window the form with errors
   // has to scroll, and the sticky header then covers the first field in the screenshot.

@@ -50,7 +50,7 @@ covers a second page, that is when one is worth adding.
 Debugging:
 
 ```bash
-npx playwright test --headed     # watch the browser
+npx playwright test --headed     # watch the browser (visual tests are skipped)
 npx playwright test --debug      # step through, with the inspector
 ```
 
@@ -62,8 +62,11 @@ messages, against screenshots kept in the repo next to it
 shows the expected image, the actual one, and the difference highlighted.
 
 Fonts render differently on each operating system, so the baselines were recorded on
-macOS and these tests are skipped elsewhere. After an intended change to the page,
-record new baselines and commit them:
+macOS and these tests are skipped elsewhere. They are also skipped with `--headed`: a
+visible browser is a different Chromium build, and the form comes out 2px shorter, so it
+could never match. The baselines belong to the way the suite normally runs, without a
+visible browser. After an intended change to the page, record new baselines (without
+`--headed`) and commit them:
 
 ```bash
 npx playwright test --grep @visual --update-snapshots
