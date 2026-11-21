@@ -13,6 +13,8 @@ type SignupFixtures = {
   signupPage: SignupPage;
   /** Expected page text for the project's language. */
   copy: ReturnType<typeof copyFor>;
+  /** Errors the page logged during the test. Checked after every test; see below. */
+  pageErrors: string[];
 };
 
 export const test = base.extend<SignupOptions & SignupFixtures>({
@@ -28,6 +30,22 @@ export const test = base.extend<SignupOptions & SignupFixtures>({
   copy: async ({ lang }, use) => {
     await use(copyFor(lang));
   },
+
+  // Runs around every test without being asked for. A script error the user never sees
+  // still fails the test, after its own checks have passed. Errors only: warnings are
+  // often harmless notices, and failing on them would make the suite noisy.
+  pageErrors: [
+    async ({ page }, use) => {
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(`uncaught: ${error.message}`));
+      page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(`console.error: ${message.text()}`);
+      });
+      await use(errors);
+      expect(errors, 'the page logged errors that a user would not see').toEqual([]);
+    },
+    { auto: true },
+  ],
 });
 
 // Re-exported so a test has one import, and cannot reach for the plain

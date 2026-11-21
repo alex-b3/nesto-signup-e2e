@@ -142,6 +142,7 @@ test.describe('Signup validation @negative', () => {
     signupPage,
     request,
     lang,
+    pageErrors,
   }) => {
     const user = buildUser();
     // The first account only has to exist. Creating it without a browser keeps this test
@@ -158,6 +159,13 @@ test.describe('Signup validation @negative', () => {
     // Asserting what it should be would fail every run and tell nobody anything, so the
     // disagreement lives in the bug report instead. See A-07.
     expect(second.status()).toBe(400);
+
+    // The browser logs every 4xx reply as a console error, a moment after the reply
+    // arrives. This one is the refusal under test, so it is taken out; anything else the
+    // page logged still fails the test.
+    const isRefusal = (error: string) => error.includes('status of 400');
+    await expect.poll(() => pageErrors.some(isRefusal)).toBe(true);
+    pageErrors.splice(pageErrors.findIndex(isRefusal), 1);
   });
 
   test('nothing typed into the form is sent to a third party', async ({
