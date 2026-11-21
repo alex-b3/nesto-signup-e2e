@@ -139,12 +139,12 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
 
 ## What the brief asked for, and where it is
 
-40 tests, each run in English and French.
+44 tests, each run in English and French.
 
 | The brief asks for | Where |
 |---|---|
 | Positive test cases | `tests/signup/signup-positive.spec.ts` - 9 tests |
-| Negative test cases | `tests/signup/signup-negative.spec.ts` - 19 tests |
+| Negative test cases | `tests/signup/signup-negative.spec.ts` - 23 tests |
 | Coverage of fields and labels | `tests/signup/fields-and-labels.spec.ts` - 5 tests |
 | The create-account API returns 201 and the body contains what was entered | `tests/signup/signup-api.spec.ts` - 3 tests, through the form and on its own (A-06) |
 | Running in French and English | `playwright.config.ts` - one project per language; `tests/signup/language-switch.spec.ts` - 2 tests for the toggle |

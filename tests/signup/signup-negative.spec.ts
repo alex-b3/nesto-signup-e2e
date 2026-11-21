@@ -1,7 +1,11 @@
 import { test, expect } from '../../src/fixtures/test';
 import { buildUser } from '../../src/data/userFactory';
 import { errorsFor } from '../../src/i18n/copy';
-import { CREATE_ACCOUNT_PATH, buildCreateAccountPayload } from '../../src/api/signupEndpoint';
+import {
+  CREATE_ACCOUNT_PATH,
+  buildCreateAccountPayload,
+  type CreateAccountRequest,
+} from '../../src/api/signupEndpoint';
 
 test.describe('Signup validation @negative', () => {
   test('an empty form is refused and nothing is sent', async ({ signupPage, page, lang }) => {
@@ -20,6 +24,9 @@ test.describe('Signup validation @negative', () => {
   test.describe('required fields', () => {
     const required = [
       { field: 'firstName', message: 'fieldRequired' },
+      { field: 'lastName', message: 'fieldRequired' },
+      // Empty email, phone and password get a format message, not "required". See BUG-10.
+      { field: 'phone', message: 'invalidPhone' },
       { field: 'email', message: 'invalidEmail' },
       { field: 'password', message: 'passwordTooShort' },
     ] as const;
@@ -61,6 +68,16 @@ test.describe('Signup validation @negative', () => {
         expect(sent).toHaveLength(0);
       });
     }
+
+    test('a phone number that is too short is refused', async ({ signupPage, page, lang }) => {
+      const errors = errorsFor(lang);
+      const sent = signupPage.recordCreateAccountCalls();
+      await signupPage.fillForm(buildUser({ phone: '123' }));
+
+      await signupPage.submit.click();
+      await expect(page.getByText(errors.invalidPhone).first()).toBeVisible();
+      expect(sent).toHaveLength(0);
+    });
   });
 
   test.describe('password rules', () => {
@@ -138,35 +155,47 @@ test.describe('Signup validation @negative', () => {
     }
   });
 
-  test('an address that is already registered is refused', async ({
-    signupPage,
-    request,
-    lang,
-    pageErrors,
-  }) => {
-    const user = buildUser();
-    // The first account only has to exist. Creating it without a browser keeps this test
-    // about the second attempt.
-    const first = await request.post(CREATE_ACCOUNT_PATH, {
-      data: buildCreateAccountPayload(user, lang),
+  const duplicates = [
+    { case: 'written the same way', secondEmail: (email: string) => email },
+    { case: 'written in capitals', secondEmail: (email: string) => email.toUpperCase() },
+  ];
+
+  for (const duplicate of duplicates) {
+    test(`an address that is already registered is refused, ${duplicate.case}`, async ({
+      signupPage,
+      request,
+      lang,
+      pageErrors,
+    }) => {
+      const user = buildUser();
+      // The first account only has to exist. Creating it without a browser keeps this test
+      // about the second attempt.
+      const first = await request.post(CREATE_ACCOUNT_PATH, {
+        data: buildCreateAccountPayload(user, lang),
+      });
+      expect(first.ok()).toBe(true);
+
+      const secondEmail = duplicate.secondEmail(user.email);
+      await signupPage.fillForm({ ...user, email: secondEmail });
+      const second = await signupPage.submitAndCaptureCreateCall();
+
+      // Checked so the capitals case proves the server ignores case, rather than the form
+      // quietly lowering it on the way.
+      expect((second.request().postDataJSON() as CreateAccountRequest).email).toBe(secondEmail);
+
+      // 400 "bad format" is what the API answers today, where 409 would fit a duplicate.
+      // Asserting what it should be would fail every run and tell nobody anything, so the
+      // disagreement lives in the bug report instead. See A-07.
+      expect(second.status()).toBe(400);
+
+      // The browser logs every 4xx reply as a console error, a moment after the reply
+      // arrives. This one is the refusal under test, so it is taken out; anything else the
+      // page logged still fails the test.
+      const isRefusal = (error: string) => error.includes('status of 400');
+      await expect.poll(() => pageErrors.some(isRefusal)).toBe(true);
+      pageErrors.splice(pageErrors.findIndex(isRefusal), 1);
     });
-    expect(first.ok()).toBe(true);
-
-    await signupPage.fillForm(user);
-    const second = await signupPage.submitAndCaptureCreateCall();
-
-    // 400 "bad format" is what the API answers today, where 409 would fit a duplicate.
-    // Asserting what it should be would fail every run and tell nobody anything, so the
-    // disagreement lives in the bug report instead. See A-07.
-    expect(second.status()).toBe(400);
-
-    // The browser logs every 4xx reply as a console error, a moment after the reply
-    // arrives. This one is the refusal under test, so it is taken out; anything else the
-    // page logged still fails the test.
-    const isRefusal = (error: string) => error.includes('status of 400');
-    await expect.poll(() => pageErrors.some(isRefusal)).toBe(true);
-    pageErrors.splice(pageErrors.findIndex(isRefusal), 1);
-  });
+  }
 
   test('nothing typed into the form is sent to a third party', async ({
     signupPage,

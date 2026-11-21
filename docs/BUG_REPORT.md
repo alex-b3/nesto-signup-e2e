@@ -234,6 +234,7 @@ field says "between 12 and 32 characters", so the two disagree.
 **Actual:**
 ```
 empty first name  ->  The field is required           correct
+empty phone       ->  Invalid value                   wrong problem
 empty email       ->  Invalid email                   wrong problem
 empty password    ->  Minimum of 12 letters required  wrong problem
 ```

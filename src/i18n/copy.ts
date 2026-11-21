@@ -105,6 +105,7 @@ const errors = {
     fieldRequired: 'The field is required',
     invalidEmail: 'Invalid email',
     invalidName: 'Invalid name',
+    invalidPhone: 'Invalid value',
     // "letters" is wrong - a password has to contain a digit, so it cannot be 12
     // letters. The hint above the field says "characters". See BUG-09.
     passwordTooShort: 'Minimum of 12 letters required',
@@ -117,6 +118,7 @@ const errors = {
     fieldRequired: 'Ce champ est obligatoire.',
     invalidEmail: 'Courriel invalide',
     invalidName: 'Nom invalide',
+    invalidPhone: 'Valeur invalide.',
     passwordTooShort: 'Minimum de 12 lettres requises',
     passwordTooLong: 'Maximum de 32 lettres requises',
     passwordWeak:

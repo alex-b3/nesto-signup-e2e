@@ -17,8 +17,8 @@ The brief says "create as many accounts as you need" but not who clears them up,
 signup API has no delete. I assumed accumulating accounts is fine. Every account the
 suite creates has an email of the form `auto-<time>-<random>@qa-automation.test`, so
 they can be found in a single query on that pattern. The names vary, because some tests
-check accented and hyphenated names. A full run creates 26: 13 per language, one for
-each positive test, each API test and the duplicate-email test.
+check accented and hyphenated names. A full run creates 28: 14 per language, one for
+each positive test, each API test and each duplicate-email test.
 *If I am wrong:* they can be filtered and removed by that email pattern.
 
 **A-02 - A domain that can never receive mail is the right kind of throwaway.**
