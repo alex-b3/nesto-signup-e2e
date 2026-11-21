@@ -71,6 +71,22 @@ Adding a test automatically covers both languages. Nothing needs duplicating.
 |---|---|---|
 | `BASE_URL` | `https://app.qa.nesto.ca` | Environment under test |
 | `EMAIL_DOMAIN` | `qa-automation.test` | Domain for generated test accounts |
+| `FAIL_ON_PAGE_ERRORS` | `true` | Fail a test when its page logs an error; `false` only lists them in the report |
+
+A variable can be set for one run on the command line, or kept in `.env`:
+
+```bash
+FAIL_ON_PAGE_ERRORS=false npm test                    # this run only
+echo "FAIL_ON_PAGE_ERRORS=false" >> .env && npm test  # every run, until removed
+```
+
+A value set on the command line or by a CI job wins over `.env`. In a CI job, expose
+the setting as a job parameter and pass it to the tests as an environment variable of
+the same name.
+
+`FAIL_ON_PAGE_ERRORS` is off only when it is exactly `false`; any other value, or a
+typo, leaves the check on. When it is off, each test that saw errors still lists them
+in the HTML report, under "page errors".
 
 `EMAIL_DOMAIN` must not be `example.com`, `example.org`, `example.net` or
 `test.com`: the signup API rejects those with
@@ -81,8 +97,9 @@ cannot reach a real person.
 ## Layout
 
 ```
-src/config/env.ts       BASE_URL and EMAIL_DOMAIN, with defaults
-src/fixtures/test.ts    the typed `lang` option each project sets
+src/config/env.ts       the variables above, with their defaults
+src/fixtures/test.ts    the typed `lang` option, the open signup page, and a check that
+                        fails any test whose page logs an error
 src/pages/              page objects: locators and actions, no assertions
 tests/signup/           the tests: assertions, no locators
 ```

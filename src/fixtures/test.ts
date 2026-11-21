@@ -1,6 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { SignupPage } from '../pages/SignupPage';
 import { copyFor } from '../i18n/copy';
+import { env } from '../config/env';
 import type { Lang } from '../lang';
 
 export type SignupOptions = {
@@ -34,15 +35,21 @@ export const test = base.extend<SignupOptions & SignupFixtures>({
   // Runs around every test without being asked for. A script error the user never sees
   // still fails the test, after its own checks have passed. Errors only: warnings are
   // often harmless notices, and failing on them would make the suite noisy.
+  // FAIL_ON_PAGE_ERRORS=false keeps the errors in the report without failing the test.
   pageErrors: [
-    async ({ page }, use) => {
+    async ({ page }, use, testInfo) => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(`uncaught: ${error.message}`));
       page.on('console', (message) => {
         if (message.type() === 'error') errors.push(`console.error: ${message.text()}`);
       });
       await use(errors);
-      expect(errors, 'the page logged errors that a user would not see').toEqual([]);
+
+      if (env.failOnPageErrors) {
+        expect(errors, 'the page logged errors that a user would not see').toEqual([]);
+      } else if (errors.length > 0) {
+        await testInfo.attach('page errors', { body: errors.join('\n'), contentType: 'text/plain' });
+      }
     },
     { auto: true },
   ],
