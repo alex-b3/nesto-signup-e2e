@@ -159,4 +159,41 @@ test.describe('Signup validation @negative', () => {
     // disagreement lives in the bug report instead. See A-07.
     expect(second.status()).toBe(400);
   });
+
+  test('nothing typed into the form is sent to a third party', async ({
+    signupPage,
+    page,
+    context,
+  }) => {
+    const isThirdParty = (url: string) => !new URL(url).hostname.endsWith('nesto.ca');
+    const thirdPartyRequests: string[] = [];
+    context.on('request', (request) => {
+      if (isThirdParty(request.url())) {
+        thirdPartyRequests.push(`${request.url()}\n${request.postData() ?? ''}`);
+      }
+    });
+
+    // Names unlikely to appear anywhere by chance, so a match can only be a leak.
+    const user = buildUser({ firstName: 'Zorblatt', lastName: 'Quixwell' });
+    await signupPage.fillForm(user);
+
+    // Not submitted. Closing the page makes the trackers send what they have batched, as
+    // they do when a visitor leaves. That request arrives after close() returns, so wait
+    // for it; this also fails the test if nothing was watched at all.
+    const flushed = context.waitForEvent(
+      'request',
+      (request) => isThirdParty(request.url()) && request.postData() !== null,
+    );
+    await page.close({ runBeforeUnload: true });
+    await flushed;
+
+    // Session replay bodies cannot be read here, so for replay this proves nothing; it
+    // relies on the page's own masking setting.
+    for (const value of [user.firstName, user.lastName, user.phone, user.email, user.password]) {
+      const leaks = thirdPartyRequests.filter(
+        (request) => request.includes(value) || request.includes(encodeURIComponent(value)),
+      );
+      expect(leaks, `"${value}" was sent to a third party`).toEqual([]);
+    }
+  });
 });
