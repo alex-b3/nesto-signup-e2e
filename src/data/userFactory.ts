@@ -13,8 +13,8 @@ export type TestUser = {
 
 /**
  * A fresh signup user: every call returns a different email, so tests run in parallel.
- * Accounts cannot be deleted through the API, so the name is fixed and obvious - nesto
- * can find everything this suite created with one query on "Auto Suite".
+ * Accounts cannot be deleted through the API, so every email starts with `auto-` - nesto
+ * can find everything this suite created with one query on that. See A-01.
  */
 export function buildUser(overrides: Partial<TestUser> = {}): TestUser {
   // Timestamp groups one run together; the random part stops parallel workers colliding.

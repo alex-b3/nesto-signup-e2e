@@ -14,10 +14,12 @@ what I decided, and what happens if I was wrong. Code that depends on one carrie
 
 **A-01 - Test accounts are permanent, and that is acceptable.**
 The brief says "create as many accounts as you need" but not who clears them up, and the
-signup API has no delete. I assumed accumulating accounts is fine. Every one is
-identifiable: first name `Auto`, last name `Suite`, so they can be found in a single
-query. A full run creates four.
-*If I am wrong:* they can be filtered and removed by that name.
+signup API has no delete. I assumed accumulating accounts is fine. Every account the
+suite creates has an email of the form `auto-<time>-<random>@qa-automation.test`, so
+they can be found in a single query on that pattern. The names vary, because some tests
+check accented and hyphenated names. A full run creates 26: 13 per language, one for
+each positive test, each API test and the duplicate-email test.
+*If I am wrong:* they can be filtered and removed by that email pattern.
 
 **A-02 - A domain that can never receive mail is the right kind of throwaway.**
 The brief says to use throwaway addresses but not which domain, and the obvious choice is
