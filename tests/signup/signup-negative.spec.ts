@@ -3,6 +3,7 @@ import { buildUser } from '../../src/data/userFactory';
 import {
   CREATE_ACCOUNT_PATH,
   buildCreateAccountPayload,
+  HTTP_CREATED,
   type CreateAccountRequest,
 } from '../../src/api/signupEndpoint';
 
@@ -161,7 +162,7 @@ test.describe('Signup validation @negative', () => {
       const first = await request.post(CREATE_ACCOUNT_PATH, {
         data: buildCreateAccountPayload(user, lang),
       });
-      expect(first.ok()).toBe(true);
+      expect(first.status()).toBe(HTTP_CREATED);
 
       const secondEmail = duplicate.secondEmail(user.email);
       await signupPage.fillForm({ ...user, email: secondEmail });
