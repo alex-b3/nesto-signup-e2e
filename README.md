@@ -136,6 +136,7 @@ src/fixtures/test.ts    the typed `lang` option, the open signup page, and a che
 src/lang.ts             the languages, their browser locale; the projects are built from it
 src/routes.ts           every page's URL per language
 src/pages/              page objects: locators and actions, no assertions
+src/assertions/         shared checks used by several tests
 tests/signup/           the tests: assertions, no locators
 ```
 

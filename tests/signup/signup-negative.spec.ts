@@ -1,5 +1,6 @@
 import { test, expect } from '../../src/fixtures/test';
 import { buildUser } from '../../src/data/userFactory';
+import { submitAndExpectRefusal } from '../../src/assertions/refusal';
 import {
   CREATE_ACCOUNT_PATH,
   buildCreateAccountPayload,
@@ -9,15 +10,7 @@ import {
 
 test.describe('Signup validation @negative', () => {
   test('an empty form is refused and nothing is sent', async ({ signupPage, page, errors }) => {
-    const sent = signupPage.recordCreateAccountCalls();
-
-    await signupPage.submit.click();
-    await expect(page.getByText(errors.fieldRequired).first()).toBeVisible();
-
-    // The message matters less than this: the form has to refuse before it asks the
-    // server. If it ever submitted anyway, an account would be created with nothing in
-    // it, and a test looking only at messages would not notice.
-    expect(sent).toHaveLength(0);
+    await submitAndExpectRefusal(signupPage, page, errors.fieldRequired);
   });
 
   test.describe('required fields', () => {
@@ -32,46 +25,30 @@ test.describe('Signup validation @negative', () => {
 
     for (const { field, message } of required) {
       test(`${field} is required on its own`, async ({ signupPage, page, errors }) => {
-        const sent = signupPage.recordCreateAccountCalls();
         // Everything else valid, so the missing field is the only possible reason.
         await signupPage.fillForm(buildUser({ [field]: '' }));
-
-        await signupPage.submit.click();
-        await expect(page.getByText(errors[message]).first()).toBeVisible();
-        expect(sent).toHaveLength(0);
+        await submitAndExpectRefusal(signupPage, page, errors[message]);
       });
     }
 
     test('a name containing digits is refused', async ({ signupPage, page, errors }) => {
-      const sent = signupPage.recordCreateAccountCalls();
       // This rule is why the user factory cannot put a run id in a name.
       await signupPage.fillForm(buildUser({ firstName: 'Auto123' }));
-
-      await signupPage.submit.click();
-      await expect(page.getByText(errors.invalidName).first()).toBeVisible();
-      expect(sent).toHaveLength(0);
+      await submitAndExpectRefusal(signupPage, page, errors.invalidName);
     });
 
     for (const field of ['firstName', 'lastName'] as const) {
       test(`a ${field} containing HTML is refused`, async ({ signupPage, page, errors }) => {
-        const sent = signupPage.recordCreateAccountCalls();
         // The API stores markup as given (BUG-06), so only the form refuses it, and anyone can
         // skip the form by calling the API directly. Bold rather than a script: nothing would run.
         await signupPage.fillForm(buildUser({ [field]: '<b>x</b>' }));
-
-        await signupPage.submit.click();
-        await expect(page.getByText(errors.invalidName).first()).toBeVisible();
-        expect(sent).toHaveLength(0);
+        await submitAndExpectRefusal(signupPage, page, errors.invalidName);
       });
     }
 
     test('a phone number that is too short is refused', async ({ signupPage, page, errors }) => {
-      const sent = signupPage.recordCreateAccountCalls();
       await signupPage.fillForm(buildUser({ phone: '123' }));
-
-      await signupPage.submit.click();
-      await expect(page.getByText(errors.invalidPhone).first()).toBeVisible();
-      expect(sent).toHaveLength(0);
+      await submitAndExpectRefusal(signupPage, page, errors.invalidPhone);
     });
   });
 
@@ -89,12 +66,8 @@ test.describe('Signup validation @negative', () => {
 
     for (const rule of passwords) {
       test(`a password with ${rule.case} is refused`, async ({ signupPage, page, errors }) => {
-        const sent = signupPage.recordCreateAccountCalls();
         await signupPage.fillForm(buildUser({ password: rule.password }));
-
-        await signupPage.submit.click();
-        await expect(page.getByText(errors[rule.message]).first()).toBeVisible();
-        expect(sent).toHaveLength(0);
+        await submitAndExpectRefusal(signupPage, page, errors[rule.message]);
       });
     }
   });
@@ -115,14 +88,10 @@ test.describe('Signup validation @negative', () => {
         errors,
       }) => {
         const user = buildUser();
-        const sent = signupPage.recordCreateAccountCalls();
 
         await signupPage.fillForm(user);
         await signupPage.passwordConfirmation.fill(variant.confirmation(user.password));
-
-        await signupPage.submit.click();
-        await expect(page.getByText(errors.passwordsDiffer)).toBeVisible();
-        expect(sent).toHaveLength(0);
+        await submitAndExpectRefusal(signupPage, page, errors.passwordsDiffer);
       });
     }
   });
@@ -134,12 +103,8 @@ test.describe('Signup validation @negative', () => {
 
     for (const email of badEmails) {
       test(`"${email}" is refused as an email`, async ({ signupPage, page, errors }) => {
-        const sent = signupPage.recordCreateAccountCalls();
         await signupPage.fillForm(buildUser({ email }));
-
-        await signupPage.submit.click();
-        await expect(page.getByText(errors.invalidEmail).first()).toBeVisible();
-        expect(sent).toHaveLength(0);
+        await submitAndExpectRefusal(signupPage, page, errors.invalidEmail);
       });
     }
   });

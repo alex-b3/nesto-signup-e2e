@@ -78,10 +78,7 @@ export class SignupPage {
     await this.passwordConfirmation.fill(user.password);
   }
 
-  /**
-   * Records create-account calls into the returned list. The negative tests use it: a
-   * message on screen does not prove that nothing was sent.
-   */
+  /** Records create-account calls into the returned list, so a test can count them. */
   recordCreateAccountCalls(): string[] {
     const calls: string[] = [];
     this.page.on('request', (request) => {

@@ -32,7 +32,11 @@ export default tseslint.config(
   {
     files: ['tests/**/*.ts'],
     // A skip with a condition is a decision; a bare skip is usually a forgotten one.
-    rules: { 'playwright/no-skipped-test': ['warn', { allowConditional: true }] },
+    rules: {
+      'playwright/no-skipped-test': ['warn', { allowConditional: true }],
+      // This helper holds the negative tests' assertions; see src/assertions/refusal.ts.
+      'playwright/expect-expect': ['warn', { assertFunctionNames: ['submitAndExpectRefusal'] }],
+    },
   },
 
   // The config file is not part of the TypeScript project.
