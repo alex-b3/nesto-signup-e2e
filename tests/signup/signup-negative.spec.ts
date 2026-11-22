@@ -1,6 +1,5 @@
 import { test, expect } from '../../src/fixtures/test';
 import { buildUser } from '../../src/data/userFactory';
-import { errorsFor } from '../../src/i18n/copy';
 import {
   CREATE_ACCOUNT_PATH,
   buildCreateAccountPayload,
@@ -8,8 +7,7 @@ import {
 } from '../../src/api/signupEndpoint';
 
 test.describe('Signup validation @negative', () => {
-  test('an empty form is refused and nothing is sent', async ({ signupPage, page, lang }) => {
-    const errors = errorsFor(lang);
+  test('an empty form is refused and nothing is sent', async ({ signupPage, page, errors }) => {
     const sent = signupPage.recordCreateAccountCalls();
 
     await signupPage.submit.click();
@@ -32,8 +30,7 @@ test.describe('Signup validation @negative', () => {
     ] as const;
 
     for (const { field, message } of required) {
-      test(`${field} is required on its own`, async ({ signupPage, page, lang }) => {
-        const errors = errorsFor(lang);
+      test(`${field} is required on its own`, async ({ signupPage, page, errors }) => {
         const sent = signupPage.recordCreateAccountCalls();
         // Everything else valid, so the missing field is the only possible reason.
         await signupPage.fillForm(buildUser({ [field]: '' }));
@@ -44,8 +41,7 @@ test.describe('Signup validation @negative', () => {
       });
     }
 
-    test('a name containing digits is refused', async ({ signupPage, page, lang }) => {
-      const errors = errorsFor(lang);
+    test('a name containing digits is refused', async ({ signupPage, page, errors }) => {
       const sent = signupPage.recordCreateAccountCalls();
       // This rule is why the user factory cannot put a run id in a name.
       await signupPage.fillForm(buildUser({ firstName: 'Auto123' }));
@@ -56,8 +52,7 @@ test.describe('Signup validation @negative', () => {
     });
 
     for (const field of ['firstName', 'lastName'] as const) {
-      test(`a ${field} containing HTML is refused`, async ({ signupPage, page, lang }) => {
-        const errors = errorsFor(lang);
+      test(`a ${field} containing HTML is refused`, async ({ signupPage, page, errors }) => {
         const sent = signupPage.recordCreateAccountCalls();
         // The API stores markup as given (BUG-06), so only the form refuses it, and anyone can
         // skip the form by calling the API directly. Bold rather than a script: nothing would run.
@@ -69,8 +64,7 @@ test.describe('Signup validation @negative', () => {
       });
     }
 
-    test('a phone number that is too short is refused', async ({ signupPage, page, lang }) => {
-      const errors = errorsFor(lang);
+    test('a phone number that is too short is refused', async ({ signupPage, page, errors }) => {
       const sent = signupPage.recordCreateAccountCalls();
       await signupPage.fillForm(buildUser({ phone: '123' }));
 
@@ -93,8 +87,7 @@ test.describe('Signup validation @negative', () => {
     ] as const;
 
     for (const rule of passwords) {
-      test(`a password with ${rule.case} is refused`, async ({ signupPage, page, lang }) => {
-        const errors = errorsFor(lang);
+      test(`a password with ${rule.case} is refused`, async ({ signupPage, page, errors }) => {
         const sent = signupPage.recordCreateAccountCalls();
         await signupPage.fillForm(buildUser({ password: rule.password }));
 
@@ -118,9 +111,8 @@ test.describe('Signup validation @negative', () => {
       test(`a confirmation that ${variant.case} is refused`, async ({
         signupPage,
         page,
-        lang,
+        errors,
       }) => {
-        const errors = errorsFor(lang);
         const user = buildUser();
         const sent = signupPage.recordCreateAccountCalls();
 
@@ -140,8 +132,7 @@ test.describe('Signup validation @negative', () => {
     const badEmails = ['not-an-email', 'spaces in@mail.test'];
 
     for (const email of badEmails) {
-      test(`"${email}" is refused as an email`, async ({ signupPage, page, lang }) => {
-        const errors = errorsFor(lang);
+      test(`"${email}" is refused as an email`, async ({ signupPage, page, errors }) => {
         const sent = signupPage.recordCreateAccountCalls();
         await signupPage.fillForm(buildUser({ email }));
 

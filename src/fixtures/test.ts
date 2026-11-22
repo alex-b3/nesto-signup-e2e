@@ -1,6 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import { SignupPage } from '../pages/SignupPage';
-import { copyFor } from '../i18n/copy';
+import { copyFor, errorsFor } from '../i18n/copy';
 import { env } from '../config/env';
 import type { Lang } from '../lang';
 
@@ -14,6 +14,8 @@ type SignupFixtures = {
   signupPage: SignupPage;
   /** Expected page text for the project's language. */
   copy: ReturnType<typeof copyFor>;
+  /** Expected validation messages for the project's language. */
+  errors: ReturnType<typeof errorsFor>;
   /** Errors the page logged during the test. Checked after every test; see below. */
   pageErrors: string[];
 };
@@ -30,6 +32,10 @@ export const test = base.extend<SignupOptions & SignupFixtures>({
 
   copy: async ({ lang }, use) => {
     await use(copyFor(lang));
+  },
+
+  errors: async ({ lang }, use) => {
+    await use(errorsFor(lang));
   },
 
   // Runs around every test without being asked for, and collects script errors the user

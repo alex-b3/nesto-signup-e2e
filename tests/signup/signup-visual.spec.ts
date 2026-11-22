@@ -1,5 +1,4 @@
 import { test, expect } from '../../src/fixtures/test';
-import { errorsFor } from '../../src/i18n/copy';
 
 /**
  * Compares the form with screenshots kept next to this file. Only the form is captured,
@@ -29,10 +28,10 @@ test.describe('Signup form appearance @visual', () => {
   test('the form with its error messages looks as recorded', async ({
     signupPage,
     page,
-    lang,
+    errors,
   }) => {
     await signupPage.submit.click();
-    await expect(page.getByText(errorsFor(lang).fieldRequired).first()).toBeVisible();
+    await expect(page.getByText(errors.fieldRequired).first()).toBeVisible();
 
     await expect(signupPage.form).toHaveScreenshot('form-with-errors.png');
   });
