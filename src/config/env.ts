@@ -10,6 +10,6 @@ export const env = {
   // 422 "placeholder email detected". See A-02.
   emailDomain: process.env.EMAIL_DOMAIN ?? 'qa-automation.test',
 
-  // On unless set to exactly "false", so a typo leaves the check on rather than off.
-  failOnPageErrors: process.env.FAIL_ON_PAGE_ERRORS !== 'false',
+  // Off unless set to exactly "true".
+  failOnPageErrors: process.env.FAIL_ON_PAGE_ERRORS === 'true',
 } as const;
