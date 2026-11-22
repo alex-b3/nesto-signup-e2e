@@ -25,7 +25,6 @@ export default tseslint.config(
     },
   },
 
-  // Playwright's own rules apply to the tests, not to page objects or config.
   {
     files: ['tests/**/*.ts'],
     ...playwright.configs['flat/recommended'],

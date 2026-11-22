@@ -51,20 +51,6 @@ export class SignupPage {
     this.html = page.locator('html');
   }
 
-  /** Every control a user fills in, in the order they appear. */
-  get allFields(): Locator[] {
-    return [
-      this.firstName,
-      this.lastName,
-      this.phone,
-      this.province,
-      this.email,
-      this.password,
-      this.passwordConfirmation,
-      this.consent,
-    ];
-  }
-
   static pathFor(lang: Lang): string {
     return lang === 'fr' ? '/fr/signup' : '/signup';
   }
@@ -74,10 +60,9 @@ export class SignupPage {
     // The form is client-rendered, so wait for it rather than for the load event.
     await this.submit.waitFor();
 
-    // Painted is not ready: anything typed before the page's JavaScript starts is
-    // discarded, on 6 attempts out of 6. The page offers no readiness marker, so wait for
-    // its network to go quiet. Playwright discourages networkidle - a page that polls
-    // forever never reaches it - but this one settles in about half a second. See T-03.
+    // Anything typed before the page's JavaScript starts is discarded, and the page gives
+    // no readiness signal. Playwright discourages networkidle, since a page that polls
+    // never reaches it, but this one settles in about half a second. See T-03.
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -93,12 +78,8 @@ export class SignupPage {
   }
 
   /**
-   * Start recording create-account calls, and hand back the list they land in. Used by
-   * the negative tests: the form is expected to refuse before anything is sent, and a
-   * message on screen is not proof of that on its own.
-   *
-   * The listener is never removed because the page is thrown away at the end of the
-   * test, which takes the listener with it.
+   * Records create-account calls into the returned list. The negative tests use it: a
+   * message on screen does not prove that nothing was sent.
    */
   recordCreateAccountCalls(): string[] {
     const calls: string[] = [];
@@ -126,7 +107,6 @@ export class SignupPage {
     );
   }
 
-  /** Every option in the province dropdown, in the order the page lists them. */
   async provinceOptions(): Promise<{ value: string; text: string }[]> {
     return this.province.locator('option').evaluateAll((options) =>
       options.map((option) => ({

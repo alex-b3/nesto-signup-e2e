@@ -39,8 +39,6 @@ test.describe('Language switch @language', () => {
     await signupPage.languageSwitch.click();
     await page.waitForURL(SignupPage.pathFor(other));
 
-    // Someone half way through the form who realises they would rather read French
-    // should not have to start again.
     await expect(signupPage.firstName).toHaveValue(user.firstName);
     await expect(signupPage.lastName).toHaveValue(user.lastName);
     await expect(signupPage.email).toHaveValue(user.email);

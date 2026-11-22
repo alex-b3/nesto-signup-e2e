@@ -9,11 +9,7 @@ import {
   type CreateAccountResponse,
 } from '../../src/api/signupEndpoint';
 
-/**
- * The brief asks that the create-account API returns 201 and that "the body response
- * contains the entered information in the form". That reads two ways - the endpoint's
- * own contract, or the round trip starting at the form - so both are covered. See A-06.
- */
+/** Covered two ways: the endpoint on its own, and the round trip from the form. See A-06. */
 test.describe('Create-account API @api', () => {
   test('the endpoint returns 201 and echoes the payload', async ({ request, lang }) => {
     const user = buildUser();

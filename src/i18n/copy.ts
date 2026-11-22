@@ -96,9 +96,8 @@ const provinces = {
 } as const;
 
 /**
- * Validation messages, taken from the running pages. Which message a field gives is not
- * consistent: an empty name says it is required, an empty email says the address is
- * invalid, and an empty password complains about its length. See BUG-10.
+ * Validation messages, taken from the running pages. Which field gives which message is
+ * inconsistent; see BUG-10.
  */
 const errors = {
   en: {

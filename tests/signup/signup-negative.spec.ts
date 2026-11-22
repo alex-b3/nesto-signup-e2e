@@ -106,10 +106,7 @@ test.describe('Signup validation @negative', () => {
   });
 
   test.describe('password confirmation', () => {
-    // The confirmation is compared exactly: a different case or a stray trailing space is
-    // still a mismatch. Worth pinning down - trimming one field and not the other would
-    // reject two passwords that look identical on screen, and comparing them
-    // case-insensitively would quietly weaken every password on the site.
+    // Compared exactly: a different case or a trailing space is still a mismatch.
     const confirmations = [
       { case: 'is empty', confirmation: () => '' },
       { case: 'is a different password', confirmation: () => 'DifferentPass123' },

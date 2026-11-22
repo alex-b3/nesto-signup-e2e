@@ -30,9 +30,7 @@ export function buildUser(overrides: Partial<TestUser> = {}): TestUser {
     phone: '5145550123',
     // Meets the page's rule: 12-32 characters with an upper, a lower and a digit.
     password: 'AutoTest1234',
-    // Deliberately not Alberta, which is what the page fills in by itself. Submitting a
-    // different province proves the selection took effect instead of passing on the
-    // default. See A-04.
+    // Not Alberta, the page's own default, so the selection is observable. See A-04.
     province: 'QC',
     ...overrides,
   };

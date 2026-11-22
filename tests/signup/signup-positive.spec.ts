@@ -25,7 +25,6 @@ test.describe('Signing up @positive', () => {
     // A URL alone would pass on a page that failed to render.
     await expect(quotePage.heading).toHaveText(quoteCopyFor(lang).heading);
 
-    // The avatar shows who is signed in, tying the new account back to this form.
     await expect(quotePage.userInitials).toHaveText(initialsOf(user));
   });
 
@@ -66,8 +65,7 @@ test.describe('Signing up @positive', () => {
     const response = await signupPage.submitAndCaptureCreateCall();
     expect(response.status()).toBe(HTTP_CREATED);
 
-    // The only check that a ticked box reaches the server as true. This consent covers
-    // sharing mortgage details with partners, so a box that sent false would matter.
+    // The only check that a ticked box reaches the server as true.
     const { account } = (await response.json()) as CreateAccountResponse;
     expect(account.leadDistributeConsentAgreement).toBe(true);
   });
@@ -119,8 +117,6 @@ test.describe('Signing up @positive', () => {
     const user = buildUser();
     await signupPage.fillForm(user);
 
-    // Plenty of people never reach for the button. If the keyboard path ever stopped
-    // matching the click path, nothing else in the suite would notice.
     const [response] = await Promise.all([
       signupPage.waitForCreateAccountCall(),
       signupPage.email.press('Enter'),
@@ -138,7 +134,6 @@ test.describe('Signing up @positive', () => {
     // It stays on screen while the browser leaves for the identity provider.
     await expect(signupPage.submit).toBeDisabled();
 
-    // An impatient customer should not end up with three accounts.
     expect(sent).toHaveLength(1);
   });
 });

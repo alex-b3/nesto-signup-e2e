@@ -35,7 +35,6 @@ export const test = base.extend<SignupOptions & SignupFixtures>({
   // Runs around every test without being asked for. A script error the user never sees
   // still fails the test, after its own checks have passed. Errors only: warnings are
   // often harmless notices, and failing on them would make the suite noisy.
-  // FAIL_ON_PAGE_ERRORS=false keeps the errors in the report without failing the test.
   pageErrors: [
     async ({ page }, use, testInfo) => {
       const errors: string[] = [];

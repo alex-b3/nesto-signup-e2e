@@ -25,8 +25,6 @@ test.describe('Signup fields and labels @labels', () => {
     await expect(signupPage.password).toHaveAttribute('type', 'password');
     await expect(signupPage.passwordConfirmation).toHaveAttribute('type', 'password');
 
-    // This hint is the only place on the page that states the password rules. If it is
-    // ever removed, people have to guess and learn them by being rejected.
     await expect(page.getByText(copy.passwordHint)).toBeVisible();
   });
 
@@ -45,7 +43,6 @@ test.describe('Signup fields and labels @labels', () => {
   });
 
   test('the consent box starts unticked and can be ticked', async ({ signupPage, copy, page }) => {
-    // Consent to be contacted by partners has to be opt-in, not opt-out.
     await expect(signupPage.consent).not.toBeChecked();
     await expect(page.getByText(copy.consent)).toBeVisible();
 
