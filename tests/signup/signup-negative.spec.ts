@@ -178,7 +178,7 @@ test.describe('Signup validation @negative', () => {
 
       // The browser logs every 4xx reply as a console error, a moment after the reply
       // arrives. This one is the refusal under test, so it is taken out; anything else the
-      // page logged still fails the test.
+      // page logged is still reported.
       const isRefusal = (error: string) => error.includes('status of 400');
       await expect.poll(() => pageErrors.some(isRefusal)).toBe(true);
       pageErrors.splice(pageErrors.findIndex(isRefusal), 1);
