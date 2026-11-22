@@ -87,6 +87,14 @@ once per language without any loop inside the test, and either can be run alone.
 
 Adding a test automatically covers both languages. Nothing needs duplicating.
 
+Adding a language starts with one line: add it to `languages` in `src/lang.ts`. The
+projects are built from that list, and every per-language table (page text and error
+messages in `src/i18n/copy.ts`, page URLs in `src/routes.ts`, browser locale in
+`src/lang.ts`) stops compiling until it has an entry for the new language, so the
+compiler lists what is left to do. Page objects take their URLs from `src/routes.ts`, so
+no page object needs editing. The language-switch tests assume
+two languages and would need rethinking.
+
 ## Configuration
 
 `.env` is optional — everything has a working default. Copy `.env.example` to
@@ -125,6 +133,8 @@ cannot reach a real person.
 src/config/env.ts       the variables above, with their defaults
 src/fixtures/test.ts    the typed `lang` option, the open signup page, and a check that
                         collects errors the page logs (see FAIL_ON_PAGE_ERRORS)
+src/lang.ts             the languages, their browser locale; the projects are built from it
+src/routes.ts           every page's URL per language
 src/pages/              page objects: locators and actions, no assertions
 tests/signup/           the tests: assertions, no locators
 ```

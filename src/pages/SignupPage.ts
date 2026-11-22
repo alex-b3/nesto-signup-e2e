@@ -2,6 +2,7 @@ import type { Locator, Page, Response } from '@playwright/test';
 import type { Lang } from '../lang';
 import type { TestUser } from '../data/userFactory';
 import { isCreateAccountCall } from '../api/signupEndpoint';
+import { routes } from '../routes';
 
 /**
  * The signup page. Locators and actions only; assertions belong in the tests.
@@ -52,7 +53,7 @@ export class SignupPage {
   }
 
   static pathFor(lang: Lang): string {
-    return lang === 'fr' ? '/fr/signup' : '/signup';
+    return routes.signup[lang];
   }
 
   async goto(lang: Lang): Promise<void> {

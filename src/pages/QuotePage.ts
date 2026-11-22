@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Lang } from '../lang';
+import { routes } from '../routes';
 
 /**
  * The quote page, which is where a successful signup lands. Only the parts that confirm
@@ -16,11 +17,7 @@ export class QuotePage {
     this.userInitials = page.getByTestId('menu-button');
   }
 
-  /**
-   * The language marker is a suffix here (/getaquote/fr), unlike the /fr prefix the
-   * signup page uses. See BUG-02.
-   */
   static pathFor(lang: Lang): string {
-    return lang === 'fr' ? '/getaquote/fr' : '/getaquote';
+    return routes.quote[lang];
   }
 }
