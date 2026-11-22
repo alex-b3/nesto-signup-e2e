@@ -75,6 +75,10 @@ npx playwright test --grep @visual --update-snapshots
 The error screenshot shows the current messages, including BUG-09 and BUG-10, so
 fixing either one will need new baselines.
 
+The baselines were recorded on macOS 26. Another macOS version can render fonts very
+slightly differently; if these four tests fail on a first run with nothing else
+failing, record your own baselines with the command above.
+
 ## Both languages
 
 The signup page takes its language from the URL path: `/signup` in English,
