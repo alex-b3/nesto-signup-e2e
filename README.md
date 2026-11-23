@@ -137,7 +137,8 @@ src/lang.ts             the languages, their browser locale; the projects are bu
 src/routes.ts           every page's URL per language
 src/pages/              page objects: locators and actions, no assertions
 src/assertions/         shared checks used by several tests
-tests/signup/           the tests: assertions, no locators
+tests/signup/           the tests. Elements come from the page objects; a test finds an
+                        element by its text only when that text is what it checks
 ```
 
 `npm run lint` uses `eslint-plugin-playwright` together with type-aware rules. The
@@ -152,7 +153,7 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
 ## Documents
 
 - `docs/ASSUMPTIONS.md` - what the brief left open, what I decided, and what breaks if I
-  was wrong. Code that depends on one carries an `A-xx` or `T-xx` comment.
+  was wrong. Where a line of code depends on one, it carries an `A-xx` or `T-xx` comment.
 - `docs/BUG_REPORT.md` - issues found while building the suite, with steps to reproduce.
 
 ## What the brief asked for, and where it is
@@ -166,7 +167,7 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
 | Coverage of fields and labels | `tests/signup/fields-and-labels.spec.ts` - 5 tests |
 | The create-account API returns 201 and the body contains what was entered | `tests/signup/signup-api.spec.ts` - 3 tests, through the form and on its own (A-06) |
 | Running in French and English | `playwright.config.ts` - one project per language; `tests/signup/language-switch.spec.ts` - 2 tests for the toggle |
-| Assumptions written down alongside the code | `docs/ASSUMPTIONS.md`, with `A-xx` comments where the code depends on one |
+| Assumptions written down alongside the code | `docs/ASSUMPTIONS.md`, with `A-xx` comments where a line of code depends on one |
 | TypeScript | strict mode, `tsconfig.json` |
 | A short bug report | `docs/BUG_REPORT.md` |
 | How to install and run | Quick start, above |
@@ -174,13 +175,15 @@ English and French. The page's `id` attributes are generated (`field-2`, `field-
 
 ## How AI was used
 
-Claude Code was used as an assistant for scaffolding and drafting code. Test design,
-scope and the assumptions are mine. Every change was reviewed before committing, and a
-fair number were rejected or rewritten - a discovery script and a set of documents were
-dropped as unrequested, a readiness wait was replaced because it measured the wrong
-thing, and a comment in `src/api/signupEndpoint.ts` claiming certain payload fields were
-required turned out to be wrong when I tested it. Commits carry a `Co-Authored-By`
-trailer so the record is plain.
+Claude Code was used throughout: exploring the page and its API, finding and reproducing
+bugs, proposing test designs, and writing code and documents. I decided what went in, and
+every change was reviewed with me before it was committed. Some of my decisions: no
+attack payloads or load against nesto's environment; CI planned but not switched on,
+because each run creates accounts in nesto's QA environment; page errors reported by
+default rather than failing runs; page URLs kept in one place so a new language touches
+one file; and dropping a discovery script, a formatter and a few suggested tests as more
+than this task needs. I re-checked every bug by hand before sending. Commits carry a
+`Co-Authored-By` trailer so the record is plain.
 
 ## What I would add next
 

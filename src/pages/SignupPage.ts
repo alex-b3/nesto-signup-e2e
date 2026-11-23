@@ -7,7 +7,7 @@ import { routes } from '../routes';
 /**
  * The signup page. Locators and actions only; assertions belong in the tests.
  * Locators use `data-testid`: it is the only anchor that survives the language switch,
- * and the generated ids (field-2, field-4, ...) shift with render order.
+ * and the generated ids (field-2, field-4, ...) shift with render order. See A-03, T-01.
  */
 export class SignupPage {
   readonly firstName: Locator;

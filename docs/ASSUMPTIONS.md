@@ -5,8 +5,8 @@ decided it and moved on. A **trade-off** is something given up on purpose.
 
 Things I checked against the QA environment are not listed as assumptions - they are
 facts, and they live in the tests that assert them. Each entry says what I did not know,
-what I decided, and what happens if I was wrong. Code that depends on one carries an
-`A-xx` or `T-xx` comment at the line it affects.
+what I decided, and what happens if I was wrong. Where a line of code depends on one, it
+carries an `A-xx` or `T-xx` comment.
 
 ---
 
@@ -53,12 +53,11 @@ would point straight at the factory.
 **A-06 - "The entered information in the form" is covered twice, because it reads two ways.**
 The requirement can mean the endpoint's own contract - send those fields, check they come
 back - or the round trip that starts at the form. Both are tested, in
-`signup-api.spec.ts`. The second is not redundant: the API stores whatever phone format it
-is given (`5145550123` and `514-555-0123` are both accepted and stored verbatim, see
-BUG-06), so the
-`+1` is added by the page, not the server. The same goes for the form's province arriving
-as `region` and the page's language arriving as `preferredLanguage`. A test that builds
-its own payload cannot notice if the page stops doing any of that.
+`signup-api.spec.ts`. The second is not redundant: the API stores whatever phone it is
+given (`123` was accepted and stored as `123`, with no country code added; see BUG-06),
+so the `+1` is added by the page, not the server. The same goes for the form's province
+arriving as `region` and the page's language arriving as `preferredLanguage`. A test that
+builds its own payload cannot notice if the page stops doing any of that.
 *If I am wrong* about which reading was meant, one of the two tests is surplus rather than
 missing.
 
