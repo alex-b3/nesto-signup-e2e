@@ -30,6 +30,8 @@ quietly un-tick, and submit without noticing. Nothing on the page tells a client
 is safe to type, so the suite waits for the network to go quiet (T-03). Disabling the form
 until the JavaScript has started would fix it.
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-02 - The French quote page keeps the English title
@@ -51,6 +53,8 @@ until the JavaScript has started would fix it.
 **Notes:** The page content and `<html lang>` are French; only the title is not. Separately,
 the two pages put the language in different places: /fr/signup but /getaquote/fr.
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-03 - The signup page has no top-level heading
@@ -66,6 +70,8 @@ the two pages put the language in different places: /fr/signup but /getaquote/fr
 
 **Why it matters:** Screen reader users jump to the `<h1>` to learn what a page is for.
 Here that shortcut lands nowhere.
+
+**Re-checked:** 2026-11-22, by hand, with the steps above.
 
 ---
 
@@ -85,6 +91,8 @@ without a browser and has no protection (BUG-05), so the form is the only thing 
 the rule. Rated High because an account exists that nobody set a password for, and the
 reply hands out a token for it. I did not check whether that token works or whether the
 account can sign in later; the sign-in page needs a password, and I did not try other ways.
+
+**Re-checked:** 2026-11-22, by hand: still `201` with a token for the new account. Whether the token works is still not checked.
 
 ---
 
@@ -106,6 +114,8 @@ slowed down.
 to flood the environment. CSRF protection is left out on purpose: the call uses no
 cookies, so there is no session to abuse. The suite relies on this openness, but so could
 abuse. Whether production blocks it is a question for the team.
+
+**Re-checked:** 2026-11-22: a single request from the terminal, with no browser, cookie or token, still creates an account. Throttling was not re-tested.
 
 ---
 
@@ -167,6 +177,8 @@ stops that (BUG-05). This is why the negative tests check that no request was se
 only that a message appeared. The `<script>` value is stored as given; I did not test
 whether it is escaped where it is later shown.
 
+**Re-checked:** 2026-11-22, by hand: the API stored `<b>x</b>` as a first name (account `1083449`, request id `bcd410bb-f78b-4d2a-9b01-2842a21f4188`), and the form refused the same name with "Invalid name".
+
 ---
 
 ## BUG-07 - A duplicate email is refused with the wrong status and message
@@ -184,6 +196,8 @@ whether it is escaped where it is later shown.
 it cannot show a useful message. Matching is correctly case-insensitive. The suite asserts
 `400` because that is today's behaviour (A-07).
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-08 - Password rule failures answer `401 Unauthorized`
@@ -199,6 +213,8 @@ it cannot show a useful message. Matching is correctly case-insensitive. The sui
 
 **Notes:** `401` means "not signed in", which does not apply to creating an account. The
 same endpoint answers `422`, naming the field, for a bad `region` or `language`.
+
+**Re-checked:** 2026-11-22: `401` again (request id `36630f35-9722-4e98-a64d-fc8de0fd8d8b`).
 
 ---
 
@@ -220,6 +236,8 @@ FR  Minimum de 12 lettres requises   Maximum de 32 lettres requises
 **Notes:** A password must contain a digit, so it cannot be all letters. The hint above the
 field says "between 12 and 32 characters", so the two disagree.
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-10 - Empty fields are reported as badly formatted rather than missing
@@ -240,6 +258,8 @@ empty password    ->  Minimum of 12 letters required  wrong problem
 ```
 
 **Notes:** Only the name fields say what is actually wrong.
+
+**Re-checked:** 2026-11-22, by hand, with the steps above.
 
 ---
 
@@ -263,6 +283,8 @@ forgets to escape a value. With markup getting into stored names (BUG-06), that 
 net matters more. Adding one is not trivial: the page loads scripts from Google Tag Manager
 and Didomi and sends data to Datadog, all of which the policy would have to allow.
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-12 - The French password hint is not grammatical
@@ -280,6 +302,8 @@ une lettre majuscule, une lettre minuscule et un chiffre."
 **Notes:** "au entre" is not French; the English hint reads correctly. The suite asserts
 the text as it is, so a fix needs `src/i18n/copy.ts` and the visual baselines updated.
 
+**Re-checked:** 2026-11-22, by hand, with the steps above.
+
 ---
 
 ## BUG-13 - "British-Columbia" is hyphenated in the English province list
@@ -295,3 +319,5 @@ the text as it is, so a fix needs `src/i18n/copy.ts` and the visual baselines up
 
 **Notes:** It looks like the French form, "Colombie-Britannique", carried over. The value
 sent is still `BC`, so only the label is wrong. The suite asserts it as it is.
+
+**Re-checked:** 2026-11-22, by hand, with the steps above.
